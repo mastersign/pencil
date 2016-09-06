@@ -2,6 +2,7 @@
 /classes
 /checkouts
 /out/js
+/out/tmp
 pom.xml
 pom.xml.asc
 *.jar
