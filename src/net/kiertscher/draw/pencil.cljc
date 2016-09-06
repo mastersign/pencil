@@ -8,9 +8,13 @@
   (be/info "Drawing with a pencil."))
 
 (defn my-draw-f [ctx]
-  (p/fill-rect ctx 40 30 10 20)
-  (doseq [v (range 10 40 5)]
-    (p/draw-rect ctx v v v v)))
+  (p/set-line-style ctx (p/line-style 2.0 (p/color 1.0 0.0 0.5)))
+  (p/set-fill-style ctx (p/fill-style (p/color 0.5 0.5)))
+  (p/fill-rect ctx 10 10 180 180)
+  (p/fill-rect ctx 50 50 100 100)
+  (doseq [v (range 20 60 5)]
+    (p/draw-rect ctx v v v v))
+  (p/clear-rect ctx 100 100 50 50))
 
 #?(:cljs (be/draw-on-canvas "basics" my-draw-f))
 

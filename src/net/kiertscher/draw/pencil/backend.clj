@@ -1,7 +1,7 @@
 (ns net.kiertscher.draw.pencil.backend
-  (:require [net.kiertscher.draw.pencil.core :refer [IGraphicsContext]])
+  (:require [net.kiertscher.draw.pencil.core :as core])
   (:import [java.io File]
-           [java.awt Graphics2D Color]
+           [java.awt Graphics2D Color BasicStroke AlphaComposite]
            [java.awt.image BufferedImage]
            [java.awt.geom Rectangle2D$Float]
            [javax.imageio ImageIO]
@@ -13,29 +13,91 @@
   (JOptionPane/showMessageDialog
     nil txt "Info Message" JOptionPane/INFORMATION_MESSAGE))
 
+(defn- convert-color-value
+  [v]
+  (int (* 255.0 (min 1.0 (max 0.0 v)))))
+
+(defn- convert-color
+  [c]
+  (Color. ^int (convert-color-value (:r c))
+          ^int (convert-color-value (:g c))
+          ^int (convert-color-value (:b c))
+          ^int (convert-color-value (:a c))))
+
+(defn- update-line-style
+  [ctx]
+  (let [g (:g ctx)
+        {:keys [color width]} (:line-style (deref (:state ctx)))]
+    (.setColor g (convert-color color))
+    (.setStroke g (BasicStroke. width))))
+
+(defn- update-fill-style
+  [ctx]
+  (let [g (:g ctx)
+        {:keys [color]} (:fill-style (deref (:state ctx)))]
+    (.setColor g (convert-color color))))
+
+(defn- clear-rect [g x y w h]
+  (let [comp (.getComposite g)]
+    (.setComposite g AlphaComposite/Clear)
+    (.fillRect g x y w h)
+    (.setComposite g comp)))
+
 (defrecord JavaAwtContext
   [^BufferedImage img
-   ^Graphics2D g]
+   ^Graphics2D g
+   state]
 
-  IGraphicsContext
+  core/IClearing
 
-  (draw-rect [_ x y w h]
+  (clear-rect [ctx x y w h]
+    (clear-rect g x y w h)
+    ctx)
+
+  (clear-all [ctx]
+    (clear-rect g 0 0 (.getWidth img) (.getHeight img))
+    ctx)
+  
+  core/IDrawing
+
+  (set-line-style [ctx s]
+    (let [s' (core/complete-line-style s)]
+      (swap! state (fn [s] (assoc s :line-style s'))))
+    ctx)
+
+  (draw-rect [ctx x y w h]
+    (update-line-style ctx)
     (let [s (Rectangle2D$Float. x y w h)]
-      (.draw g s)))
+      (.draw g s))
+    ctx)
 
-  (fill-rect [_ x y w h]
+  core/IFilling
+
+  (set-fill-style [ctx s]
+    (let [s' (core/complete-fill-style s)]
+      (swap! state (fn [s] (assoc s :fill-style s'))))
+    ctx)
+
+  (fill-rect [ctx x y w h]
+    (update-fill-style ctx)
     (let [s (Rectangle2D$Float. x y w h)]
-      (.fill g s))))
+      (.fill g s))
+    ctx))
 
 (defn create-image
   [w h]
   (BufferedImage. w h BufferedImage/TYPE_INT_ARGB))
 
+(defn- initial-state-atom
+  []
+  (atom {:line-style (core/line-style)
+         :fill-style (core/fill-style)}))
+
 (defn open-image-context
   [^BufferedImage img]
   (let [g (.getGraphics img)]
     (.setColor g Color/BLUE)
-    (->JavaAwtContext img g)))
+    (->JavaAwtContext img g (initial-state-atom))))
 
 (defn save-image
   [^BufferedImage img ^String path ^String type]
