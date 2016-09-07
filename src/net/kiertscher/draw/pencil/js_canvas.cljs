@@ -9,7 +9,12 @@
 (defn- format-color-value
   [v]
   (.toString
-    (int (* 255.0 (min 1.0 (max 0.0 v))))))
+    (int (.floor js/Math (* 255.0 (min 1.0 (max 0.0 v)))))))
+
+(defn- format-alpha-value
+  [v]
+  (.toString
+    (/ (.floor js/Math (* 255.0 (min 1.0 (max 0.0 v)))) 255.0)))
 
 (defn- color->css
   [c]
@@ -17,7 +22,7 @@
        (format-color-value (:r c)) ","
        (format-color-value (:g c)) ","
        (format-color-value (:b c)) ","
-       (.toString (:a c))
+       (format-alpha-value (:a c))
        ")"))
 
 (defrecord HtmlCanvasContext
