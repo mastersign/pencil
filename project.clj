@@ -7,7 +7,7 @@
                  [org.clojure/clojurescript "1.9.227"]]
   :plugins [[lein-cljsbuild "1.1.4"]]
   :cljsbuild {:builds [{:id "pencil"
-                        :source-paths ["src"]
+                        :source-paths ["src" "test"]
                         :compiler {:output-to "out/js/pencil.js"
                                    :optimizations :whitespace}}]}
   :source-paths ["src"])

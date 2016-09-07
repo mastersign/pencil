@@ -1,8 +1,7 @@
 /target
 /classes
-/checkouts
 /out/js
-/out/tmp
+/out/test
 pom.xml
 pom.xml.asc
 *.jar

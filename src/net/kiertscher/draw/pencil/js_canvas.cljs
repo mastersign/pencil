@@ -1,5 +1,5 @@
-(ns net.kiertscher.draw.pencil.backend
-  (:require [net.kiertscher.draw.pencil.core :as core]))
+(ns net.kiertscher.draw.pencil.js-canvas
+  (:require [net.kiertscher.draw.pencil :as core]))
 
 (defn info
   "Display an info message."
@@ -20,7 +20,7 @@
        (.toString (:a c))
        ")"))
 
-(defrecord CanvasContext
+(defrecord HtmlCanvasContext
   [id g]
 
   core/IClearing
@@ -36,7 +36,7 @@
   core/IDrawing
 
   (set-line-style [ctx s]
-    (let [{:keys [width color]} (core/complete-line-style s)]
+    (let [{:keys [width color]} (core/make-up-line-style s)]
       (set! (.-strokeStyle g) (color->css color))
       (set! (.-lineWidth g) width))
     ctx)
@@ -48,7 +48,7 @@
   core/IFilling
 
   (set-fill-style [ctx s]
-    (let [{:keys [color]} (core/complete-fill-style s)]
+    (let [{:keys [color]} (core/make-up-fill-style s)]
       (set! (.-fillStyle g) (color->css color)))
     ctx)
 
@@ -56,15 +56,11 @@
     (.fillRect g x y w h)
     ctx))
 
-(defn open-canvas-context
-  [id]
+(defn draw
+  [id f]
   (let [el (.getElementById js/document id)
         ctx (.getContext el "2d")]
-    (-> (->CanvasContext id ctx)
+    (-> (->HtmlCanvasContext id ctx)
         (core/set-line-style (core/line-style))
-        (core/set-fill-style (core/fill-style)))))
-
-(defn draw-on-canvas
-  [id f]
-  (let [ctx (open-canvas-context id)]
-    (f ctx)))
+        (core/set-fill-style (core/fill-style))
+        (f))))
