@@ -7,18 +7,17 @@
   #?(:clj
      (:import [java.io File])))
 
-(defn drawing-basics [ctx]
-  (p/set-line-style ctx (p/line-style (p/color 1.0 0.0 0.5) 2.0))
-  (p/set-fill-style ctx (p/fill-style (p/color 0.5 0.5)))
-  (p/fill-rect ctx 10 10 180 180)
-  (p/set-fill-style ctx (p/fill-style (p/color 0.5)))
-  (p/fill-rect ctx 50 50 100 100)
-  (doseq [v (range 20 60 5)]
-    (p/draw-rect ctx v v v v))
-  (p/clear-rect ctx 100 100 50 50))
+(defn sketch-draw-line [ctx]
+  (-> ctx
+      (p/set-line-style (p/line-style))
+      (p/draw-line 10 10 10 40)
+      (p/draw-line 15.333 10 15.333 40)
+      (p/draw-line 20.5 10 20.5 40)
+      (p/draw-line 25 10 26 40)
+      (p/draw-line 30 10 35 40)))
 
-(def test-drawings
-  {:basics {:f drawing-basics :w 200 :h 200}})
+(def test-sketches
+  {:draw-line {:f sketch-draw-line :w 200 :h 50}})
 
 (defn draw
   [id w h f]
@@ -33,5 +32,5 @@
                (set! (.-height e) h))
              (jsc/draw id f))))
 
-(doseq [[id {:keys [w h f]}] test-drawings]
+(doseq [[id {:keys [w h f]}] test-sketches]
   (draw (name id) w h f))

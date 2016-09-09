@@ -1,5 +1,5 @@
 (ns net.kiertscher.draw.pencil.js-canvas-test
-  (:require [net.kiertscher.draw.pencil-test :refer [test-drawings]]))
+  (:require [net.kiertscher.draw.pencil-test :refer [test-sketches]]))
 
 (defn- get-el
   [id]
@@ -32,7 +32,7 @@
                         (* 4 (+ x (* y w)))))))
 
 (do
-  (doseq [[id {:keys [w h]}] test-drawings]
+  (doseq [[id {:keys [w h]}] test-sketches]
     (let [n (name id)
           can (get-el n)
           img-awt (get-el (str n "-awt"))
