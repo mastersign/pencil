@@ -3,7 +3,7 @@
   (:import [java.io File]
            [java.awt Graphics2D Color BasicStroke AlphaComposite]
            [java.awt.image BufferedImage]
-           [java.awt.geom Rectangle2D$Float]
+           [java.awt.geom Line2D$Float Rectangle2D$Float]
            [javax.imageio ImageIO]
            [javax.swing JOptionPane]))
 
@@ -63,6 +63,12 @@
   (set-line-style [ctx s]
     (let [s' (core/make-up-line-style s)]
       (swap! state (fn [s] (assoc s :line-style s'))))
+    ctx)
+
+  (draw-line [ctx x1 y1 x2 y2]
+    (update-line-style ctx)
+    (let [s (Line2D$Float. x1 y1 x2 y2)]
+      (.draw g s))
     ctx)
 
   (draw-rect [ctx x y w h]

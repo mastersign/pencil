@@ -46,8 +46,18 @@
       (set! (.-lineWidth g) width))
     ctx)
 
+  (draw-line [ctx x1 y1 x2 y2]
+    (doto g
+      (.beginPath)
+      (.moveTo x1 y1)
+      (.lineTo x2 y2)
+      (.stroke))
+    ctx)
+
   (draw-rect [ctx x y w h]
-    (.strokeRect g x y w h)
+    (doto g
+        (.rect x y w h)
+        (.stroke))
     ctx)
 
   core/IFilling
