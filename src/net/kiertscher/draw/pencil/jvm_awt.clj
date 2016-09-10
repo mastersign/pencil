@@ -1,7 +1,7 @@
 (ns net.kiertscher.draw.pencil.jvm-awt
   (:require [net.kiertscher.draw.pencil :as core])
   (:import [java.io File]
-           [java.awt Graphics2D Color BasicStroke AlphaComposite]
+           [java.awt Graphics2D Color BasicStroke AlphaComposite RenderingHints]
            [java.awt.image BufferedImage]
            [java.awt.geom Line2D$Float Rectangle2D$Float]
            [javax.imageio ImageIO]
@@ -106,8 +106,10 @@
 
 (defn draw
   [^BufferedImage img f]
-  (let [g (.getGraphics img)]
-    (.setColor g Color/BLUE)
+  (let [^Graphics2D g (.getGraphics img)]
+    (doto g
+      (.setRenderingHint RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_ON)
+      (.setRenderingHint RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_PURE))
     (let [ctx (->JavaAwtContext img g (initial-state-atom))]
       (f ctx))
     (.dispose g)))
