@@ -5,20 +5,23 @@
   [id]
   (.getElementById js/document id))
 
+(def ^:private diff-factor 8)
+
 (defn- pixel-difference
-  [a1 a2 ar i]
+  [vs1 vs2 vsr i]
   (let [ir i
         ig (+ i 1)
         ib (+ i 2)
         ia (+ i 3)
-        color-diff (not (and (= (aget a1 ir) (aget a2 ir))
-                             (= (aget a1 ig) (aget a2 ig))
-                             (= (aget a1 ib) (aget a2 ib))))
-        alpha-diff (not (= (aget a1 ia) (aget a2 ia)))]
-    (aset ar ir (if color-diff 220 (if alpha-diff 255 128)))
-    (aset ar ig (if color-diff 0 (if alpha-diff 128 255)))
-    (aset ar ib (if color-diff 0 (if alpha-diff 0 128)))
-    (aset ar ia 255)))
+        rd (.abs js/Math (- (aget vs1 ir) (aget vs2 ir)))
+        gd (.abs js/Math (- (aget vs1 ig) (aget vs2 ig)))
+        bd (.abs js/Math (- (aget vs1 ib) (aget vs2 ib)))
+        ad (.abs js/Math (- (aget vs1 ia) (aget vs2 ia)))]
+    (aset vsr ir (- 255 (* (+ gd bd ad) diff-factor)))
+    (aset vsr ig (- 255 (* (+ rd bd ad) diff-factor)))
+    (aset vsr ib (- 255 (* (+ rd gd ad) diff-factor)))
+    (aset vsr ia 255)
+    [rd gd bd ad]))
 
 (defn- image-data-difference
   [img-data-1 img-data-2]
