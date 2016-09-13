@@ -8,7 +8,7 @@
      (:import [java.io File])))
 
 (defn sketch-draw-line [ctx]
-  (-> ctx
+  (doto ctx
       (p/set-line-style (p/line-style))
       (p/draw-line 10 10 10 40)
       (p/draw-line 15.333 10 15.333 40)
@@ -33,8 +33,30 @@
           y (* 20 (Math/sin (* (/ Math/PI 15) a)))]
       (p/draw-line ctx (+ 170 x) (+ 25 y) (- 170 x) (- 25 y)))))
 
+(defn sketch-draw-rect [ctx]
+  (doto ctx
+    (p/set-line-style (p/line-style))
+    (p/draw-rect 10 10 30 30)
+    (p/draw-rect 15.5 15 20 20)
+    (p/draw-rect 20 20.5 10 10)
+    (p/draw-rect 22.5 22.5 4 4)
+    (p/draw-rect 50 10 0 30)
+    (p/draw-rect 55 10 0.5 30)
+    (p/draw-rect 60 10 1 30)
+    (p/draw-rect 65 10 1.5 30)
+    (p/draw-rect 70 10 2 30)
+    (p/draw-rect 80.2 10 2 30)
+    (p/draw-rect 85.4 10 2 30)
+    (p/draw-rect 90.6 10 2 30)
+    (p/draw-rect 95.8 10 2 30)
+    (p/draw-rect 100 10 2 30)
+    (p/draw-rect 120 14 20 0)
+    (p/draw-rect 120 22.5 20 2)
+    (p/draw-rect 120.5 32 20 3)))
+
 (def test-sketches
-  {:draw-line {:f sketch-draw-line :w 200 :h 50}})
+  {:draw-line {:f sketch-draw-line :w 200 :h 50}
+   :draw-rect {:f sketch-draw-rect :w 200 :h 50}})
 
 (defn draw
   [id w h f]
