@@ -16,6 +16,8 @@
 
 (def ^:dynamic *default-line-color* (color 0.25))
 (def ^:dynamic *default-line-width* 1.0)
+(def ^:dynamic *default-line-cap* :square)
+(def ^:dynamic *default-line-join* :miter)
 (def ^:dynamic *default-fill-color* (color 0.75))
 
 (defprotocol IClearing
@@ -40,35 +42,65 @@
     "Draw an axis-aligned rectangle.
      Returns the context object.")
 
-  (draw-circle [_ x y r]
-    "Draw a circle around a center point.
+  (draw-arc [_ x y r] [_ x y r start extend]
+    "Draw an arc around a center point.
      Returns the context object.")
-
-  (draw-ellipis [_ x y w h]
-    "Draw an ellipsis in a bounding box.
+  
+  (draw-ellipse [_ x y w h] [_ x y w h start extend]
+    "Draw an ellipse inside of a rectangle shape.
      Returns the context object."))
 
 (defrecord LineStyle
   [^Color color
-   ^float width])
+   ^float width
+   ;; :butt, :round, :square
+   line-cap
+   ;; :bevel, :round, :miter
+   line-join])
 
 (defn line-style
   ([^Color color
+    ^double width
+    line-cap
+    line-join]
+   (->LineStyle color
+                width
+                line-cap
+                line-join))
+  ([^Color color
+    ^double width
+    line-cap]
+   (->LineStyle color
+                width
+                line-cap
+                *default-line-join*))
+  ([^Color color
     ^double width]
-   (->LineStyle color width))
+   (->LineStyle color
+                width
+                *default-line-cap*
+                *default-line-join*))
   ([^Color color]
-   (->LineStyle color *default-line-width*))
+   (->LineStyle color
+                *default-line-width*
+                *default-line-cap*
+                *default-line-join*))
   ([]
-   (->LineStyle *default-line-color* *default-line-width*)))
+   (->LineStyle *default-line-color*
+                *default-line-width*
+                *default-line-cap*
+                *default-line-join*)))
 
 (defn make-up-line-style
   [style]
   (if (instance? LineStyle style)
     style
-    (let [{:keys [color width]
-           :or   {:color *default-line-color*
-                  :width *default-line-width*}} style]
-      (->LineStyle color width))))
+    (let [{:keys [color width line-cap line-join]
+           :or   {:color     *default-line-color*
+                  :width     *default-line-width*
+                  :line-cap  *default-line-cap*
+                  :line-join *default-line-join*}} style]
+      (->LineStyle color width line-cap line-join))))
 
 (defprotocol IFilling
 
@@ -99,8 +131,8 @@
 
 (defn make-up-fill-style
   [{:keys [color]
-    :or {:color *default-fill-color*}
-    :as style}]
+    :or   {:color *default-fill-color*}
+    :as   style}]
   (if (instance? FillStyle style)
     style
     (->FillStyle color)))

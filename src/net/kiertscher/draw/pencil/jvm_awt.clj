@@ -3,7 +3,7 @@
   (:import [java.io File]
            [java.awt Graphics2D Color BasicStroke AlphaComposite RenderingHints]
            [java.awt.image BufferedImage]
-           [java.awt.geom Line2D$Float Rectangle2D$Float]
+           [java.awt.geom Line2D$Float Rectangle2D$Float Ellipse2D$Float Arc2D$Float Ellipse2D]
            [javax.imageio ImageIO]
            [javax.swing JOptionPane]))
 
@@ -24,12 +24,28 @@
           ^int (convert-color-value (:b c))
           ^int (convert-color-value (:a c))))
 
+(def ^:private line-caps
+  {:butt   BasicStroke/CAP_BUTT
+   :round  BasicStroke/CAP_ROUND
+   :square BasicStroke/CAP_SQUARE})
+
+(defn- ^int convert-line-cap [v] (v line-caps))
+
+(def ^:private line-joins
+  {:round BasicStroke/JOIN_ROUND
+   :bevel BasicStroke/JOIN_BEVEL
+   :miter BasicStroke/JOIN_MITER})
+
+(defn- convert-line-join [v] (v line-joins))
+
 (defn- update-line-style
   [ctx]
   (let [g (:g ctx)
-        {:keys [color width]} (:line-style (deref (:state ctx)))]
+        {:keys [color width line-cap line-join]} (:line-style (deref (:state ctx)))]
     (.setColor g (convert-color color))
-    (.setStroke g (BasicStroke. width))))
+    (.setStroke g (BasicStroke. width
+                                (convert-line-cap line-cap)
+                                (convert-line-join line-join)))))
 
 (defn- update-fill-style
   [ctx]
@@ -74,6 +90,23 @@
   (draw-rect [ctx x y w h]
     (update-line-style ctx)
     (let [s (Rectangle2D$Float. x y w h)]
+      (.draw g s))
+    ctx)
+
+  (draw-arc [ctx x y r]
+    (update-line-style ctx)
+    (let [s (Ellipse2D$Float. (- x r) (- y r) (* 2 r) (* 2 r))]
+      (.draw g s))
+    ctx)
+
+  (draw-arc [ctx x y r start extend]
+    (update-line-style ctx)
+    (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
+              (Ellipse2D$Float. (- x r) (- y r) (* 2 r) (* 2 r))
+              (Arc2D$Float. (- x r) (- y r) (* 2 r) (* 2 r)
+                           (* -180.0 (/ start Math/PI))
+                           (* -180.0 (/ extend Math/PI))
+                           Arc2D$Float/OPEN))]
       (.draw g s))
     ctx)
 

@@ -25,6 +25,10 @@
        (format-alpha-value (:a c))
        ")"))
 
+(defn- name
+  [v]
+  (.slice (str v) 1))
+
 (defrecord HtmlCanvasContext
   [id g]
 
@@ -41,9 +45,11 @@
   core/IDrawing
 
   (set-line-style [ctx s]
-    (let [{:keys [width color]} (core/make-up-line-style s)]
+    (let [{:keys [width color line-cap line-join]} (core/make-up-line-style s)]
       (set! (.-strokeStyle g) (color->css color))
-      (set! (.-lineWidth g) width))
+      (set! (.-lineWidth g) width)
+      (set! (.-lineCap g) (name line-cap))
+      (set! (.-lineJoin g) (name line-join)))
     ctx)
 
   (draw-line [ctx x1 y1 x2 y2]
@@ -56,8 +62,29 @@
 
   (draw-rect [ctx x y w h]
     (doto g
-        (.rect x y w h)
-        (.stroke))
+      (.beginPath)
+      (.rect x y w h)
+      (.stroke))
+    ctx)
+
+  (draw-arc [ctx x y r]
+    (doto g
+      (.beginPath)
+      (.moveTo (+ x r) y)
+      (.arc x y r 0 (* 2 Math/PI))
+      (.closePath)
+      (.stroke))
+    ctx)
+
+  (draw-arc [ctx x y r start extend]
+    (doto g
+      (.beginPath)
+      (.arc x y r
+            (if (pos? extend) start (+ start extend))
+            (if (pos? extend) (+ start extend) start)))
+    (when (>= (Math/abs extend) (* 2 Math/PI))
+      (.closePath g))
+    (.stroke g)
     ctx)
 
   core/IFilling
