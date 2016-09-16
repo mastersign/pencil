@@ -104,9 +104,26 @@
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Float. (- x r) (- y r) (* 2 r) (* 2 r))
               (Arc2D$Float. (- x r) (- y r) (* 2 r) (* 2 r)
-                           (* -180.0 (/ start Math/PI))
-                           (* -180.0 (/ extend Math/PI))
-                           Arc2D$Float/OPEN))]
+                            (* -180.0 (/ start Math/PI))
+                            (* -180.0 (/ extend Math/PI))
+                            Arc2D$Float/OPEN))]
+      (.draw g s))
+    ctx)
+
+  (draw-ellipse [ctx x y rx ry]
+    (update-line-style ctx)
+    (let [s (Ellipse2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry))]
+      (.draw g s))
+    ctx)
+
+  (draw-ellipse [ctx x y rx ry start extend]
+    (update-line-style ctx)
+    (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
+              (Ellipse2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
+              (Arc2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
+                            (* -180.0 (/ start Math/PI))
+                            (* -180.0 (/ extend Math/PI))
+                            Arc2D$Float/OPEN))]
       (.draw g s))
     ctx)
 

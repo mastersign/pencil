@@ -7,6 +7,31 @@
   #?(:clj
      (:import [java.io File])))
 
+(defn sketch-line-style [ctx]
+  (let [pattern (fn [ctx x y]
+                  (doto ctx
+                    (p/draw-line x y x (+ y 30))
+                    (p/draw-line (+ x 10.5) (+ y 30) (+ x 10.5) y)
+                    (p/draw-line (+ x 20) y (+ x 30) y)
+                    (p/draw-rect (+ x 20) (+ y 8.5) 10.5 10.5)
+                    (p/draw-line (+ x 20) (+ y 25) (+ x 30) (+ y 30))
+                    (p/draw-line (+ x 20) (+ y 30) (+ x 30) (+ y 25))))]
+    (doto ctx
+      (p/set-line-style (p/line-style (p/color 0) 1.0 :square))
+      (pattern 10 10)
+      (p/set-line-style (p/line-style (p/color 0) 1.5 :square))
+      (pattern 60 10)
+      (p/set-line-style (p/line-style (p/color 0) 3.333 :square))
+      (pattern 110 10)
+      (p/set-line-style (p/line-style (p/color 0) 3.9 :square))
+      (pattern 160 10)
+      (p/set-line-style (p/line-style (p/color 0) 5.0 :butt :bevel))
+      (pattern 10 60)
+      (p/set-line-style (p/line-style (p/color 0) 5.0 :square :miter))
+      (pattern 60 60)
+      (p/set-line-style (p/line-style (p/color 0) 5.0 :round :round))
+      (pattern 110 60))))
+
 (defn sketch-draw-line [ctx]
   (doto ctx
     (p/set-line-style (p/line-style))
@@ -54,31 +79,6 @@
     (p/draw-rect 120 22.5 20 2)
     (p/draw-rect 120.5 32 20 3)))
 
-(defn sketch-line-style [ctx]
-  (let [pattern (fn [ctx x y]
-                  (doto ctx
-                    (p/draw-line x y x (+ y 30))
-                    (p/draw-line (+ x 10.5) (+ y 30) (+ x 10.5) y)
-                    (p/draw-line (+ x 20) y (+ x 30) y)
-                    (p/draw-rect (+ x 20) (+ y 8.5) 10.5 10.5)
-                    (p/draw-line (+ x 20) (+ y 25) (+ x 30) (+ y 30))
-                    (p/draw-line (+ x 20) (+ y 30) (+ x 30) (+ y 25))))]
-    (doto ctx
-      (p/set-line-style (p/line-style (p/color 0) 1.0 :square))
-      (pattern 10 10)
-      (p/set-line-style (p/line-style (p/color 0) 1.5 :square))
-      (pattern 60 10)
-      (p/set-line-style (p/line-style (p/color 0) 3.333 :square))
-      (pattern 110 10)
-      (p/set-line-style (p/line-style (p/color 0) 3.9 :square))
-      (pattern 160 10)
-      (p/set-line-style (p/line-style (p/color 0) 5.0 :butt :bevel))
-      (pattern 10 60)
-      (p/set-line-style (p/line-style (p/color 0) 5.0 :square :miter))
-      (pattern 60 60)
-      (p/set-line-style (p/line-style (p/color 0) 5.0 :round :round))
-      (pattern 110 60))))
-
 (defn sketch-draw-arc [ctx]
   (doto ctx
     (p/draw-arc 25 25 15)
@@ -88,7 +88,16 @@
     (p/draw-arc 70 25 12.5 (* 0 Math/PI) (* 1.0 Math/PI))
     (p/draw-arc 70 25 10 (* 0 Math/PI) (* -1.0 Math/PI))
     (p/draw-arc 70 25 7.5 (* 1 Math/PI) (* 0.5 Math/PI))
-    (p/draw-arc 70 25 5 (* 1 Math/PI) (* -0.5 Math/PI))))
+    (p/draw-arc 70 25 5 (* 1 Math/PI) (* -0.5 Math/PI)))
+  (doto ctx
+    (p/draw-ellipse 125 25 15 18)
+    (p/draw-ellipse 125.5 25 12 10)
+    (p/draw-ellipse 125 25.5 4 6)
+    (p/draw-ellipse 170 25 18 15 (* 0 Math/PI) (* 2.0 Math/PI))
+    (p/draw-ellipse 170 25 10.5 12.5 (* 0 Math/PI) (* 1.0 Math/PI))
+    (p/draw-ellipse 170 25 8 10 (* 0 Math/PI) (* -1.0 Math/PI))
+    (p/draw-ellipse 170 25 3 7.5 (* 1 Math/PI) (* 0.5 Math/PI))
+    (p/draw-ellipse 170 25 5.5 6 (* 1 Math/PI) (* -0.5 Math/PI))))
 
 (def test-sketches
   {:draw-line  {:f sketch-draw-line :w 200 :h 50}

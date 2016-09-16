@@ -46,8 +46,8 @@
     "Draw an arc around a center point.
      Returns the context object.")
   
-  (draw-ellipse [_ x y w h] [_ x y w h start extend]
-    "Draw an ellipse inside of a rectangle shape.
+  (draw-ellipse [_ x y rx ry] [_ x y rx ry start extend]
+    "Draw an ellipse around a center point.
      Returns the context object."))
 
 (defrecord LineStyle

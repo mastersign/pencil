@@ -83,6 +83,25 @@
     (.stroke g)
     ctx)
 
+  (draw-ellipse [ctx x y rx ry]
+    (doto g
+      (.beginPath)
+      (.ellipse x y rx ry 0 0 (* 2 Math/PI))
+      (.closePath)
+      (.stroke))
+    ctx)
+
+  (draw-ellipse [ctx x y rx ry start extend]
+    (doto g
+      (.beginPath)
+      (.ellipse x y rx ry 0
+                (if (pos? extend) start (+ start extend))
+                (if (pos? extend) (+ start extend) start)))
+    (when (>= (Math/abs extend) (* 2 Math/PI))
+      (.closePath g))
+    (.stroke g)
+    ctx)
+
   core/IFilling
 
   (set-fill-style [ctx s]
