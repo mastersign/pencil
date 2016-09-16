@@ -25,10 +25,6 @@
        (format-alpha-value (:a c))
        ")"))
 
-(defn- name
-  [v]
-  (.slice (str v) 1))
-
 (defrecord HtmlCanvasContext
   [id g]
 
