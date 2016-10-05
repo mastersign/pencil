@@ -14,6 +14,7 @@
   ([v]
    (->Color v v v 1.0)))
 
+
 (def ^:dynamic *default-line-color* (color 0.25))
 (def ^:dynamic *default-line-width* 1.0)
 (def ^:dynamic *default-line-cap* :square)
@@ -31,24 +32,25 @@
 (defprotocol IDrawing
 
   (set-line-style [_ s]
-    "Set the style for line drawing.
-     Returns the context object.")
+    "Set the style for line drawing.")
 
   (draw-line [_ x1 y1 x2 y2]
-    "Draw a line from one point to another.
-     Returns the context object.")
+    "Draw a line from one point to another.")
 
   (draw-rect [_ x y w h]
-    "Draw an axis-aligned rectangle.
-     Returns the context object.")
+    "Draw an axis-aligned rectangle.")
 
   (draw-arc [_ x y r] [_ x y r start extend]
-    "Draw an arc around a center point.
-     Returns the context object.")
+    "Draw an arc around a center point.")
   
   (draw-ellipse [_ x y rx ry] [_ x y rx ry start extend]
-    "Draw an ellipse around a center point.
-     Returns the context object."))
+    "Draw an ellipse around a center point.")
+
+  (draw-quadratic-curve [_ x1 y1 cx cy x2 y2]
+    "Draws a quadratic Bézier curve.")
+  
+  (draw-cubic-curve [_ x1 y1 cx1 cy1 cx2 cy2 x2 y2]
+    "Draws a cubic Bézier curve."))
 
 (defrecord LineStyle
   [^Color color
@@ -105,20 +107,16 @@
 (defprotocol IFilling
 
   (set-fill-style [_ s]
-    "Set the style for filling shapes.
-     Returns the context object.")
+    "Set the style for filling shapes.")
 
   (fill-rect [_ x y w h]
-    "Fill an axis-aligned rectangle.
-     Returns the context object.")
+    "Fill an axis-aligned rectangle.")
 
-  (fill-circle [_ x y r]
-    "Fill a circle around a center point.
-     Returns the context object.")
+  (fill-arc [_ x y r]
+    "Fill an arc around a center point.")
 
-  (fill-ellipsis [_ x y w h]
-    "Fill an ellipsis in a bounding box.
-     Returns the context object."))
+  (fill-ellipsis [_ x y rx ry]
+    "Fill an ellipsis around a center point."))
 
 (defrecord FillStyle
   [^Color color])

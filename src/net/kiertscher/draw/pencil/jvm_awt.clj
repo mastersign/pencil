@@ -3,7 +3,12 @@
   (:import [java.io File]
            [java.awt Graphics2D Color BasicStroke AlphaComposite RenderingHints]
            [java.awt.image BufferedImage]
-           [java.awt.geom Line2D$Float Rectangle2D$Float Ellipse2D$Float Arc2D$Float Ellipse2D]
+           [java.awt.geom Line2D$Float
+                          Rectangle2D$Float
+                          Ellipse2D$Float
+                          Arc2D$Float
+                          QuadCurve2D$Float
+                          CubicCurve2D$Float]
            [javax.imageio ImageIO]
            [javax.swing JOptionPane]))
 
@@ -76,28 +81,25 @@
 
   core/IDrawing
 
-  (set-line-style [ctx s]
+  (set-line-style [_ s]
     (let [s' (core/make-up-line-style s)]
       (swap! state (fn [s] (assoc s :line-style s'))))
-    ctx)
+    nil)
 
   (draw-line [ctx x1 y1 x2 y2]
     (update-line-style ctx)
     (let [s (Line2D$Float. x1 y1 x2 y2)]
-      (.draw g s))
-    ctx)
+      (.draw g s)))
 
   (draw-rect [ctx x y w h]
     (update-line-style ctx)
     (let [s (Rectangle2D$Float. x y w h)]
-      (.draw g s))
-    ctx)
+      (.draw g s)))
 
   (draw-arc [ctx x y r]
     (update-line-style ctx)
     (let [s (Ellipse2D$Float. (- x r) (- y r) (* 2 r) (* 2 r))]
-      (.draw g s))
-    ctx)
+      (.draw g s)))
 
   (draw-arc [ctx x y r start extend]
     (update-line-style ctx)
@@ -107,14 +109,12 @@
                             (* -180.0 (/ start Math/PI))
                             (* -180.0 (/ extend Math/PI))
                             Arc2D$Float/OPEN))]
-      (.draw g s))
-    ctx)
+      (.draw g s)))
 
   (draw-ellipse [ctx x y rx ry]
     (update-line-style ctx)
     (let [s (Ellipse2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry))]
-      (.draw g s))
-    ctx)
+      (.draw g s)))
 
   (draw-ellipse [ctx x y rx ry start extend]
     (update-line-style ctx)
@@ -124,21 +124,28 @@
                             (* -180.0 (/ start Math/PI))
                             (* -180.0 (/ extend Math/PI))
                             Arc2D$Float/OPEN))]
-      (.draw g s))
-    ctx)
+      (.draw g s)))
+
+  (draw-quadratic-curve [ctx x1 y1 cx cy x2 y2]
+    (update-line-style ctx)
+    (let [s (QuadCurve2D$Float. x1 y1 cx cy x2 y2)]
+      (.draw g s)))
+
+  (draw-cubic-curve [ctx x1 y1 cx1 cy1 cx2 cy2 x2 y2]
+    (update-line-style ctx)
+    (let [s (CubicCurve2D$Float. x1 y1 cx1 cy1 cx2 cy2 x2 y2)]
+      (.draw g s)))
 
   core/IFilling
 
-  (set-fill-style [ctx s]
+  (set-fill-style [_ s]
     (let [s' (core/make-up-fill-style s)]
-      (swap! state (fn [s] (assoc s :fill-style s'))))
-    ctx)
+      (swap! state (fn [s] (assoc s :fill-style s')))))
 
   (fill-rect [ctx x y w h]
     (update-fill-style ctx)
     (let [s (Rectangle2D$Float. x y w h)]
-      (.fill g s))
-    ctx))
+      (.fill g s))))
 
 (defn create-image
   [w h]

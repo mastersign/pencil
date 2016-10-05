@@ -40,39 +40,35 @@
 
   core/IDrawing
 
-  (set-line-style [ctx s]
+  (set-line-style [_ s]
     (let [{:keys [width color line-cap line-join]} (core/make-up-line-style s)]
       (set! (.-strokeStyle g) (color->css color))
       (set! (.-lineWidth g) width)
       (set! (.-lineCap g) (name line-cap))
-      (set! (.-lineJoin g) (name line-join)))
-    ctx)
+      (set! (.-lineJoin g) (name line-join))))
 
-  (draw-line [ctx x1 y1 x2 y2]
+  (draw-line [_ x1 y1 x2 y2]
     (doto g
       (.beginPath)
       (.moveTo x1 y1)
       (.lineTo x2 y2)
-      (.stroke))
-    ctx)
+      (.stroke)))
 
-  (draw-rect [ctx x y w h]
+  (draw-rect [_ x y w h]
     (doto g
       (.beginPath)
       (.rect x y w h)
-      (.stroke))
-    ctx)
+      (.stroke)))
 
-  (draw-arc [ctx x y r]
+  (draw-arc [_ x y r]
     (doto g
       (.beginPath)
       (.moveTo (+ x r) y)
       (.arc x y r 0 (* 2 Math/PI))
       (.closePath)
-      (.stroke))
-    ctx)
+      (.stroke)))
 
-  (draw-arc [ctx x y r start extend]
+  (draw-arc [_ x y r start extend]
     (doto g
       (.beginPath)
       (.arc x y r
@@ -80,18 +76,16 @@
             (if (pos? extend) (+ start extend) start)))
     (when (>= (Math/abs extend) (* 2 Math/PI))
       (.closePath g))
-    (.stroke g)
-    ctx)
+    (.stroke g))
 
-  (draw-ellipse [ctx x y rx ry]
+  (draw-ellipse [_ x y rx ry]
     (doto g
       (.beginPath)
       (.ellipse x y rx ry 0 0 (* 2 Math/PI))
       (.closePath)
-      (.stroke))
-    ctx)
+      (.stroke)))
 
-  (draw-ellipse [ctx x y rx ry start extend]
+  (draw-ellipse [_ x y rx ry start extend]
     (doto g
       (.beginPath)
       (.ellipse x y rx ry 0
@@ -99,25 +93,36 @@
                 (if (pos? extend) (+ start extend) start)))
     (when (>= (Math/abs extend) (* 2 Math/PI))
       (.closePath g))
-    (.stroke g)
-    ctx)
+    (.stroke g))
+
+  (draw-quadratic-curve [_ x1 y1 cx cy x2 y2]
+    (doto g
+      (.beginPath)
+      (.moveTo x1 y1)
+      (.quadraticCurveTo cx cy x2 y2)
+      (.stroke)))
+
+  (draw-cubic-curve [_ x1 y1 cx1 cy1 cx2 cy2 x2 y2]
+    (doto g
+      (.beginPath)
+      (.moveTo x1 y1)
+      (.bezierCurveTo cx1 cy1 cx2 cy2 x2 y2)
+      (.stroke)))
 
   core/IFilling
 
-  (set-fill-style [ctx s]
+  (set-fill-style [_ s]
     (let [{:keys [color]} (core/make-up-fill-style s)]
-      (set! (.-fillStyle g) (color->css color)))
-    ctx)
+      (set! (.-fillStyle g) (color->css color))))
 
-  (fill-rect [ctx x y w h]
-    (.fillRect g x y w h)
-    ctx))
+  (fill-rect [_ x y w h]
+    (.fillRect g x y w h)))
 
 (defn draw
   [id f]
   (let [el (.getElementById js/document id)
         ctx (.getContext el "2d")]
-    (-> (->HtmlCanvasContext id ctx)
+    (doto (->HtmlCanvasContext id ctx)
         (core/set-line-style (core/line-style))
         (core/set-fill-style (core/fill-style))
         (f))))
