@@ -95,14 +95,14 @@
       (.closePath g))
     (.stroke g))
 
-  (draw-quadratic-curve [_ x1 y1 cx cy x2 y2]
+  (draw-quadratic-bezier [_ x1 y1 cx cy x2 y2]
     (doto g
       (.beginPath)
       (.moveTo x1 y1)
       (.quadraticCurveTo cx cy x2 y2)
       (.stroke)))
 
-  (draw-cubic-curve [_ x1 y1 cx1 cy1 cx2 cy2 x2 y2]
+  (draw-cubic-bezier [_ x1 y1 cx1 cy1 cx2 cy2 x2 y2]
     (doto g
       (.beginPath)
       (.moveTo x1 y1)

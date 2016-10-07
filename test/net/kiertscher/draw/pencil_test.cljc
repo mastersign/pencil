@@ -101,16 +101,18 @@
 
 (defn sketch-draw-curve [ctx]
   (doto ctx
-    (p/draw-quadratic-curve 10 10 80 20 40 40)
-    (p/draw-quadratic-curve 10 25 60 40 70 10)
-    (p/draw-cubic-curve 100 10 100 50 180 50 180 10)
-    (p/draw-cubic-curve 80 15 200 20 50 10 180 45)))
+    (p/draw-quadratic-bezier 10 10 80 20 40 40)
+    (p/draw-quadratic-bezier 10 25 60 40 70 10)
+    (p/draw-cubic-bezier 90 10 90 50 130 50 130 10)
+    (p/draw-cubic-bezier 80 15 170 20 50 10 130 45)
+    (p/draw-catmull-rom 3.0 120 10 160 10 150 40 190 30)
+    (p/draw-catmull-rom 3.0 160 10 150 40 190 30 140 10)))
 
 (def test-sketches
-  {:draw-line  {:f sketch-draw-line :w 200 :h 50}
+  {:line-style {:f sketch-line-style :w 200 :h 100}
+   :draw-line  {:f sketch-draw-line :w 200 :h 50}
    :draw-rect  {:f sketch-draw-rect :w 200 :h 50}
-   :line-style {:f sketch-line-style :w 200 :h 100}
-   :draw-arc {:f sketch-draw-arc :w 200 :h 50}
+   :draw-arc   {:f sketch-draw-arc :w 200 :h 50}
    :draw-curve {:f sketch-draw-curve :w 200 :h 50}})
 
 (defn draw

@@ -46,11 +46,22 @@
   (draw-ellipse [_ x y rx ry] [_ x y rx ry start extend]
     "Draw an ellipse around a center point.")
 
-  (draw-quadratic-curve [_ x1 y1 cx cy x2 y2]
+  (draw-quadratic-bezier [_ x1 y1 cx cy x2 y2]
     "Draws a quadratic Bézier curve.")
   
-  (draw-cubic-curve [_ x1 y1 cx1 cy1 cx2 cy2 x2 y2]
+  (draw-cubic-bezier [_ x1 y1 cx1 cy1 cx2 cy2 x2 y2]
     "Draws a cubic Bézier curve."))
+
+(defn draw-catmull-rom
+  "Draws a Catmull-Rom spline."
+  ([ctx cx1 cy1 x1 y1 x2 y2 cx2 cy2]
+    (draw-catmull-rom ctx 6.0 cx1 cy1 x1 y1 x2 y2 cx2 cy2))
+  ([ctx t cx1 cy1 x1 y1 x2 y2 cx2 cy2]
+   (draw-cubic-bezier ctx
+                      x1 y1
+                      (/ (+ (- cx1) (* t x1) x2) t) (/ (+ (- cy1) (* t y1) y2) t)
+                      (/ (+ x1 (* t x2) (- cx2)) t) (/ (+ y1 (* t y2) (- cy2)) t)
+                      x2 y2)))
 
 (defrecord LineStyle
   [^Color color
