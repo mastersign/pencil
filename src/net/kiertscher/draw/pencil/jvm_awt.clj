@@ -3,12 +3,12 @@
   (:import [java.io File]
            [java.awt Graphics2D Color BasicStroke AlphaComposite RenderingHints]
            [java.awt.image BufferedImage]
-           [java.awt.geom Line2D$Float
-                          Rectangle2D$Float
-                          Ellipse2D$Float
-                          Arc2D$Float
-                          QuadCurve2D$Float
-                          CubicCurve2D$Float]
+           [java.awt.geom Line2D$Double
+                          Rectangle2D$Double
+                          Ellipse2D$Double
+                          Arc2D$Double
+                          QuadCurve2D$Double
+                          CubicCurve2D$Double]
            [javax.imageio ImageIO]
            [javax.swing JOptionPane]))
 
@@ -88,52 +88,52 @@
 
   (draw-line [ctx x1 y1 x2 y2]
     (update-line-style ctx)
-    (let [s (Line2D$Float. x1 y1 x2 y2)]
+    (let [s (Line2D$Double. x1 y1 x2 y2)]
       (.draw g s)))
 
   (draw-rect [ctx x y w h]
     (update-line-style ctx)
-    (let [s (Rectangle2D$Float. x y w h)]
+    (let [s (Rectangle2D$Double. x y w h)]
       (.draw g s)))
 
   (draw-arc [ctx x y r]
     (update-line-style ctx)
-    (let [s (Ellipse2D$Float. (- x r) (- y r) (* 2 r) (* 2 r))]
+    (let [s (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))]
       (.draw g s)))
 
   (draw-arc [ctx x y r start extend]
     (update-line-style ctx)
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
-              (Ellipse2D$Float. (- x r) (- y r) (* 2 r) (* 2 r))
-              (Arc2D$Float. (- x r) (- y r) (* 2 r) (* 2 r)
+              (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))
+              (Arc2D$Double. (- x r) (- y r) (* 2 r) (* 2 r)
                             (* -180.0 (/ start Math/PI))
                             (* -180.0 (/ extend Math/PI))
-                            Arc2D$Float/OPEN))]
+                            Arc2D$Double/OPEN))]
       (.draw g s)))
 
   (draw-ellipse [ctx x y rx ry]
     (update-line-style ctx)
-    (let [s (Ellipse2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry))]
+    (let [s (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))]
       (.draw g s)))
 
   (draw-ellipse [ctx x y rx ry start extend]
     (update-line-style ctx)
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
-              (Ellipse2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
-              (Arc2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
+              (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
+              (Arc2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
                             (* -180.0 (/ start Math/PI))
                             (* -180.0 (/ extend Math/PI))
-                            Arc2D$Float/OPEN))]
+                            Arc2D$Double/OPEN))]
       (.draw g s)))
 
   (draw-quadratic-bezier [ctx x1 y1 cx cy x2 y2]
     (update-line-style ctx)
-    (let [s (QuadCurve2D$Float. x1 y1 cx cy x2 y2)]
+    (let [s (QuadCurve2D$Double. x1 y1 cx cy x2 y2)]
       (.draw g s)))
 
   (draw-cubic-bezier [ctx x1 y1 cx1 cy1 cx2 cy2 x2 y2]
     (update-line-style ctx)
-    (let [s (CubicCurve2D$Float. x1 y1 cx1 cy1 cx2 cy2 x2 y2)]
+    (let [s (CubicCurve2D$Double. x1 y1 cx1 cy1 cx2 cy2 x2 y2)]
       (.draw g s)))
 
   core/IFilling
@@ -144,37 +144,37 @@
 
   (fill-rect [ctx x y w h]
     (update-fill-style ctx)
-    (let [s (Rectangle2D$Float. x y w h)]
+    (let [s (Rectangle2D$Double. x y w h)]
       (.fill g s)))
 
   (fill-arc [ctx x y r]
     (update-fill-style ctx)
-    (let [s (Ellipse2D$Float. (- x r) (- y r) (* 2 r) (* 2 r))]
+    (let [s (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))]
       (.fill g s)))
 
   (fill-arc [ctx x y r start extend]
     (update-fill-style ctx)
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
-              (Ellipse2D$Float. (- x r) (- y r) (* 2 r) (* 2 r))
-              (Arc2D$Float. (- x r) (- y r) (* 2 r) (* 2 r)
+              (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))
+              (Arc2D$Double. (- x r) (- y r) (* 2 r) (* 2 r)
                             (* -180.0 (/ start Math/PI))
                             (* -180.0 (/ extend Math/PI))
-                            Arc2D$Float/PIE))]
+                            Arc2D$Double/PIE))]
       (.fill g s)))
 
   (fill-ellipse [ctx x y rx ry]
     (update-fill-style ctx)
-    (let [s (Ellipse2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry))]
+    (let [s (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))]
       (.fill g s)))
 
   (fill-ellipse [ctx x y rx ry start extend]
     (update-fill-style ctx)
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
-              (Ellipse2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
-              (Arc2D$Float. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
+              (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
+              (Arc2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
                             (* -180.0 (/ start Math/PI))
                             (* -180.0 (/ extend Math/PI))
-                            Arc2D$Float/PIE))]
+                            Arc2D$Double/PIE))]
       (.fill g s))))
 
 (defn create-image
