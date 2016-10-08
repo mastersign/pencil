@@ -11,19 +11,19 @@
                     (p/draw-line (+ x 20) (+ y 25) (+ x 30) (+ y 30))
                     (p/draw-line (+ x 20) (+ y 30) (+ x 30) (+ y 25))))]
     (doto ctx
-      (p/set-line-style (p/line-style (p/color 0) 1.0 :square))
+      (p/set-line-style (p/line-style (p/color 0.0) 1.0 :square))
       (pattern 10 10)
-      (p/set-line-style (p/line-style (p/color 0) 1.5 :square))
+      (p/set-line-style (p/line-style (p/color 0.0 0.3) 1.5 :square))
       (pattern 60 10)
-      (p/set-line-style (p/line-style (p/color 0) 3.333 :square))
+      (p/set-line-style (p/line-style (p/color 0.5 0.5 0.5) 3.333 :square))
       (pattern 110 10)
-      (p/set-line-style (p/line-style (p/color 0) 3.9 :square))
+      (p/set-line-style (p/line-style (p/color 0.2 0.5 0.8) 3.9 :square))
       (pattern 160 10)
-      (p/set-line-style (p/line-style (p/color 0) 5.0 :butt :bevel))
+      (p/set-line-style (p/line-style (p/color 0.5 0.1 0.1 0.3) 5.0 :butt :bevel))
       (pattern 10 60)
-      (p/set-line-style (p/line-style (p/color 0) 5.0 :square :miter))
+      (p/set-line-style (p/line-style (p/color 0.1 0.5 0.1 0.5) 5.0 :square :miter))
       (pattern 60 60)
-      (p/set-line-style (p/line-style (p/color 0) 5.0 :round :round))
+      (p/set-line-style (p/line-style (p/color 0.1 0.1 0.5 0.8) 5.0 :round :round))
       (pattern 110 60))))
 
 (defn sketch-draw-line [ctx]
