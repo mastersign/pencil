@@ -116,7 +116,46 @@
       (set! (.-fillStyle g) (color->css color))))
 
   (fill-rect [_ x y w h]
-    (.fillRect g x y w h)))
+    (doto g
+      (.beginPath)
+      (.rect x y w h)
+      (.fill)))
+
+  (fill-arc [_ x y r]
+    (doto g
+      (.beginPath)
+      (.arc x y r 0 (* 2 Math/PI))
+      (.closePath)
+      (.fill)))
+
+  (fill-arc [_ x y r start extend]
+    (.beginPath g)
+    (when (< (Math/abs extend) (* 2 Math/PI))
+      (.moveTo g x y))
+    (doto g
+      (.arc x y r
+            (if (pos? extend) start (+ start extend))
+            (if (pos? extend) (+ start extend) start))
+      (.closePath)
+      (.fill)))
+
+  (fill-ellipse [_ x y rx ry]
+    (doto g
+      (.beginPath)
+      (.ellipse x y rx ry 0 0 (* 2 Math/PI))
+      (.closePath)
+      (.fill)))
+
+  (fill-ellipse [_ x y rx ry start extend]
+    (.beginPath g)
+    (when (< (Math/abs extend) (* 2 Math/PI))
+      (.moveTo g x y))
+    (doto g
+      (.ellipse x y rx ry 0
+                (if (pos? extend) start (+ start extend))
+                (if (pos? extend) (+ start extend) start))
+      (.closePath)
+      (.fill))))
 
 (defn draw
   [id f]

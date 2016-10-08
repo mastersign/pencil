@@ -1,11 +1,10 @@
 (ns net.kiertscher.draw.pencil-test
-  (:require [clojure.test :refer [deftest]]
-            [net.kiertscher.draw.pencil :as p]
-    #?(:clj
-            [net.kiertscher.draw.pencil.jvm-awt :as awt]
-       :cljs [net.kiertscher.draw.pencil.js-canvas :as jsc]))
-  #?(:clj
-     (:import [java.io File])))
+  (:require
+    [clojure.test :refer [deftest]]
+    [net.kiertscher.draw.pencil :as p]
+    #?(:clj [net.kiertscher.draw.pencil.jvm-awt :as awt])
+    #?(:cljs [net.kiertscher.draw.pencil.js-canvas :as jsc]))
+  #?(:clj (:import [java.io File])))
 
 (defn sketch-line-style [ctx]
   (let [pattern (fn [ctx x y]
@@ -58,61 +57,97 @@
           y (* 20 (Math/sin (* (/ Math/PI 15) a)))]
       (p/draw-line ctx (+ 170 x) (+ 25 y) (- 170 x) (- 25 y)))))
 
+(def test-rects
+  [[10 10 30 30]
+   [15.5 15 20 20]
+   [20 20.5 10 10]
+   [22.5 22.5 4 4]
+   [50 10 0 30]
+   [55 10 0.5 30]
+   [60 10 1 30]
+   [65 10 1.5 30]
+   [70 10 2 30]
+   [80.2 10 2 30]
+   [85.4 10 2 30]
+   [90.6 10 2 30]
+   [95.8 10 2 30]
+   [100 10 2 30]
+   [120 14 20 0]
+   [120 22.5 20 2]
+   [120.5 32 20 3]])
+
 (defn sketch-draw-rect [ctx]
-  (doto ctx
-    (p/set-line-style (p/line-style))
-    (p/draw-rect 10 10 30 30)
-    (p/draw-rect 15.5 15 20 20)
-    (p/draw-rect 20 20.5 10 10)
-    (p/draw-rect 22.5 22.5 4 4)
-    (p/draw-rect 50 10 0 30)
-    (p/draw-rect 55 10 0.5 30)
-    (p/draw-rect 60 10 1 30)
-    (p/draw-rect 65 10 1.5 30)
-    (p/draw-rect 70 10 2 30)
-    (p/draw-rect 80.2 10 2 30)
-    (p/draw-rect 85.4 10 2 30)
-    (p/draw-rect 90.6 10 2 30)
-    (p/draw-rect 95.8 10 2 30)
-    (p/draw-rect 100 10 2 30)
-    (p/draw-rect 120 14 20 0)
-    (p/draw-rect 120 22.5 20 2)
-    (p/draw-rect 120.5 32 20 3)))
+  (p/set-line-style ctx (p/line-style))
+  (doseq [r test-rects]
+    (apply p/draw-rect ctx r)))
+
+(defn sketch-fill-rect [ctx]
+  (p/set-fill-style ctx (p/fill-style (p/color 0.0 0.25)))
+  (doseq [r test-rects]
+    (apply p/fill-rect ctx r)))
+
+(def test-arcs
+  [[25 25 15]
+   [25.5 25 10]
+   [25 25.5 5]
+   [70 25 15 (* 0 Math/PI) (* 2.0 Math/PI)]
+   [70 25 12.5 (* 0 Math/PI) (* 1.0 Math/PI)]
+   [70 25 10 (* 0 Math/PI) (* -1.0 Math/PI)]
+   [70 25 7.5 (* 1 Math/PI) (* 0.5 Math/PI)]
+   [70 25 5 (* 1 Math/PI) (* -0.5 Math/PI)]])
+
+(def test-ellipsis
+  [[125 25 15 18]
+   [125.5 25 12 10]
+   [125 25.5 4 6]
+   [170 25 18 15 (* 0 Math/PI) (* 2.0 Math/PI)]
+   [170 25 10.5 12.5 (* 0 Math/PI) (* 1.0 Math/PI)]
+   [170 25 8 10 (* 0 Math/PI) (* -1.0 Math/PI)]
+   [170 25 3 7.5 (* 1 Math/PI) (* 0.5 Math/PI)]
+   [170 25 5.5 6 (* 1 Math/PI) (* -0.5 Math/PI)]])
 
 (defn sketch-draw-arc [ctx]
-  (doto ctx
-    (p/draw-arc 25 25 15)
-    (p/draw-arc 25.5 25 10)
-    (p/draw-arc 25 25.5 5)
-    (p/draw-arc 70 25 15 (* 0 Math/PI) (* 2.0 Math/PI))
-    (p/draw-arc 70 25 12.5 (* 0 Math/PI) (* 1.0 Math/PI))
-    (p/draw-arc 70 25 10 (* 0 Math/PI) (* -1.0 Math/PI))
-    (p/draw-arc 70 25 7.5 (* 1 Math/PI) (* 0.5 Math/PI))
-    (p/draw-arc 70 25 5 (* 1 Math/PI) (* -0.5 Math/PI)))
-  (doto ctx
-    (p/draw-ellipse 125 25 15 18)
-    (p/draw-ellipse 125.5 25 12 10)
-    (p/draw-ellipse 125 25.5 4 6)
-    (p/draw-ellipse 170 25 18 15 (* 0 Math/PI) (* 2.0 Math/PI))
-    (p/draw-ellipse 170 25 10.5 12.5 (* 0 Math/PI) (* 1.0 Math/PI))
-    (p/draw-ellipse 170 25 8 10 (* 0 Math/PI) (* -1.0 Math/PI))
-    (p/draw-ellipse 170 25 3 7.5 (* 1 Math/PI) (* 0.5 Math/PI))
-    (p/draw-ellipse 170 25 5.5 6 (* 1 Math/PI) (* -0.5 Math/PI))))
+  (p/set-line-style ctx (p/line-style))
+  (doseq [a test-arcs]
+    (apply p/draw-arc ctx a))
+  (doseq [e test-ellipsis]
+    (apply p/draw-ellipse ctx e)))
+
+(defn sketch-fill-arc [ctx]
+  (p/set-fill-style ctx (p/fill-style (p/color 0.0 0.25)))
+  (doseq [a test-arcs]
+    (apply p/fill-arc ctx a))
+  (doseq [e test-ellipsis]
+    (apply p/fill-ellipse ctx e)))
+
+(def test-quadratic-beziers
+  [[10 10 80 20 40 40]
+   [10 25 60 40 70 10]])
+
+(def test-cubic-beziers
+  [[90 10 90 50 130 50 130 10]
+   [80 15 170 20 50 10 130 45]])
+
+(def test-catmull-roms
+  [[3.0 120 10 160 10 150 40 190 30]
+   [3.0 160 10 150 40 190 30 140 10]])
 
 (defn sketch-draw-curve [ctx]
-  (doto ctx
-    (p/draw-quadratic-bezier 10 10 80 20 40 40)
-    (p/draw-quadratic-bezier 10 25 60 40 70 10)
-    (p/draw-cubic-bezier 90 10 90 50 130 50 130 10)
-    (p/draw-cubic-bezier 80 15 170 20 50 10 130 45)
-    (p/draw-catmull-rom 3.0 120 10 160 10 150 40 190 30)
-    (p/draw-catmull-rom 3.0 160 10 150 40 190 30 140 10)))
+  (p/set-line-style ctx (p/line-style))
+  (doseq [b test-quadratic-beziers]
+    (apply p/draw-quadratic-bezier ctx b))
+  (doseq [b test-cubic-beziers]
+    (apply p/draw-cubic-bezier ctx b))
+  (doseq [cr test-catmull-roms]
+    (apply p/draw-catmull-rom ctx cr)))
 
 (def test-sketches
   {:line-style {:f sketch-line-style :w 200 :h 100}
    :draw-line  {:f sketch-draw-line :w 200 :h 50}
    :draw-rect  {:f sketch-draw-rect :w 200 :h 50}
+   :fill-rect  {:f sketch-fill-rect :w 200 :h 50}
    :draw-arc   {:f sketch-draw-arc :w 200 :h 50}
+   :fill-arc   {:f sketch-fill-arc :w 200 :h 50}
    :draw-curve {:f sketch-draw-curve :w 200 :h 50}})
 
 (defn draw

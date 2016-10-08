@@ -44,7 +44,7 @@
     "Draw an arc around a center point.")
   
   (draw-ellipse [_ x y rx ry] [_ x y rx ry start extend]
-    "Draw an ellipse around a center point.")
+    "Draw an axis-aligned ellipse around a center point.")
 
   (draw-quadratic-bezier [_ x1 y1 cx cy x2 y2]
     "Draws a quadratic Bézier curve.")
@@ -123,11 +123,11 @@
   (fill-rect [_ x y w h]
     "Fill an axis-aligned rectangle.")
 
-  (fill-arc [_ x y r]
+  (fill-arc [_ x y r] [_ x y r start extend]
     "Fill an arc around a center point.")
 
-  (fill-ellipsis [_ x y rx ry]
-    "Fill an ellipsis around a center point."))
+  (fill-ellipse [_ x y rx ry] [_ x y rx ry start extend]
+    "Fill an axis-aligned ellipsis around a center point."))
 
 (defrecord FillStyle
   [^Color color])
