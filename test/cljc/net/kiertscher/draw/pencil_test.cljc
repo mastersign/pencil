@@ -1,10 +1,5 @@
 (ns net.kiertscher.draw.pencil-test
-  (:require
-    [clojure.test :refer [deftest]]
-    [net.kiertscher.draw.pencil :as p]
-    #?(:clj [net.kiertscher.draw.pencil.jvm-awt :as awt])
-    #?(:cljs [net.kiertscher.draw.pencil.js-canvas :as jsc]))
-  #?(:clj (:import [java.io File])))
+  (:require [net.kiertscher.draw.pencil :as p]))
 
 (defn sketch-line-style [ctx]
   (let [pattern (fn [ctx x y]
@@ -149,19 +144,3 @@
    :draw-arc   {:f sketch-draw-arc :w 200 :h 50}
    :fill-arc   {:f sketch-fill-arc :w 200 :h 50}
    :draw-curve {:f sketch-draw-curve :w 200 :h 50}})
-
-(defn draw
-  [id w h f]
-  #?(:clj  (do
-             (.mkdirs (File. "out/test/awt"))
-             (awt/draw-in-file
-               (str "out/test/awt/" id ".png") "PNG"
-               w h f))
-     :cljs (do
-             (let [e (.getElementById js/document id)]
-               (set! (.-width e) w)
-               (set! (.-height e) h))
-             (jsc/draw id f))))
-
-(doseq [[id {:keys [w h f]}] test-sketches]
-  (draw (name id) w h f))

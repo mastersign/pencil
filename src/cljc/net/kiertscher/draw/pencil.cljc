@@ -14,7 +14,6 @@
   ([v]
    (->Color v v v 1.0)))
 
-
 (def ^:dynamic *default-line-color* (color 0.25))
 (def ^:dynamic *default-line-width* 1.0)
 (def ^:dynamic *default-line-cap* :square)

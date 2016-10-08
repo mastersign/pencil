@@ -1,5 +1,13 @@
-(ns net.kiertscher.draw.pencil.js-canvas-test
-  (:require [net.kiertscher.draw.pencil-test :refer [test-sketches]]))
+(ns net.kiertscher.draw.js-canvas-test
+  (:require [net.kiertscher.draw.pencil-test :as t]
+            [net.kiertscher.draw.pencil.js-canvas :as jsc]))
+
+(defn- draw
+  [id w h f]
+  (let [e (.getElementById js/document id)]
+    (set! (.-width e) w)
+    (set! (.-height e) h))
+  (jsc/draw id f))
 
 (defn- get-el
   [id]
@@ -34,18 +42,18 @@
       (pixel-difference a1 a2 a2
                         (* 4 (+ x (* y w)))))))
 
-(do
-  (doseq [[id {:keys [w h]}] test-sketches]
-    (let [n (name id)
-          can (get-el n)
-          img-awt (get-el (str n "-awt"))
-          can-diff (get-el (str n "-diff"))
-          ctx (.getContext can "2d")
-          ctx-diff (.getContext can-diff "2d")]
-      (set! (.-width can-diff) w)
-      (set! (.-height can-diff) h)
-      (.drawImage ctx-diff img-awt 0 0)
-      (let [data (.getImageData ctx 0 0 w h)
-            data-diff (.getImageData ctx-diff 0 0 w h)]
-        (image-data-difference data data-diff)
-        (.putImageData ctx-diff data-diff 0 0)))))
+(doseq [[id {:keys [w h f]}] t/test-sketches]
+  (draw (name id) w h f)
+  (let [n (name id)
+        can (get-el n)
+        img-awt (get-el (str n "-awt"))
+        can-diff (get-el (str n "-diff"))
+        ctx (.getContext can "2d")
+        ctx-diff (.getContext can-diff "2d")]
+    (set! (.-width can-diff) w)
+    (set! (.-height can-diff) h)
+    (.drawImage ctx-diff img-awt 0 0)
+    (let [data (.getImageData ctx 0 0 w h)
+          data-diff (.getImageData ctx-diff 0 0 w h)]
+      (image-data-difference data data-diff)
+      (.putImageData ctx-diff data-diff 0 0))))
