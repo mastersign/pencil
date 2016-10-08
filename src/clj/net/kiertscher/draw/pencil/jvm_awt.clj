@@ -8,7 +8,8 @@
                           Ellipse2D$Double
                           Arc2D$Double
                           QuadCurve2D$Double
-                          CubicCurve2D$Double]
+                          CubicCurve2D$Double
+                          AffineTransform]
            [javax.imageio ImageIO]
            [javax.swing JOptionPane]))
 
@@ -106,9 +107,9 @@
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))
               (Arc2D$Double. (- x r) (- y r) (* 2 r) (* 2 r)
-                            (* -180.0 (/ start Math/PI))
-                            (* -180.0 (/ extend Math/PI))
-                            Arc2D$Double/OPEN))]
+                             (* -180.0 (/ start Math/PI))
+                             (* -180.0 (/ extend Math/PI))
+                             Arc2D$Double/OPEN))]
       (.draw g s)))
 
   (draw-ellipse [ctx x y rx ry]
@@ -121,9 +122,9 @@
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
               (Arc2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
-                            (* -180.0 (/ start Math/PI))
-                            (* -180.0 (/ extend Math/PI))
-                            Arc2D$Double/OPEN))]
+                             (* -180.0 (/ start Math/PI))
+                             (* -180.0 (/ extend Math/PI))
+                             Arc2D$Double/OPEN))]
       (.draw g s)))
 
   (draw-quadratic-bezier [ctx x1 y1 cx cy x2 y2]
@@ -157,9 +158,9 @@
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))
               (Arc2D$Double. (- x r) (- y r) (* 2 r) (* 2 r)
-                            (* -180.0 (/ start Math/PI))
-                            (* -180.0 (/ extend Math/PI))
-                            Arc2D$Double/PIE))]
+                             (* -180.0 (/ start Math/PI))
+                             (* -180.0 (/ extend Math/PI))
+                             Arc2D$Double/PIE))]
       (.fill g s)))
 
   (fill-ellipse [ctx x y rx ry]
@@ -172,10 +173,33 @@
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
               (Arc2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
-                            (* -180.0 (/ start Math/PI))
-                            (* -180.0 (/ extend Math/PI))
-                            Arc2D$Double/PIE))]
-      (.fill g s))))
+                             (* -180.0 (/ start Math/PI))
+                             (* -180.0 (/ extend Math/PI))
+                             Arc2D$Double/PIE))]
+      (.fill g s)))
+
+  core/ITransforming
+
+  (set-transform [_ a b c d e f]
+    (let [t (AffineTransform. ^double a ^double b
+                              ^double c ^double d
+                              ^double e ^double f)]
+      (.setTransform g t)))
+
+  (transform [_ a b c d e f]
+    (let [t (AffineTransform. ^double a ^double b
+                              ^double c ^double d
+                              ^double e ^double f)]
+      (.transform g t)))
+
+  (translate [_ x y]
+    (.translate g ^double x ^double y))
+
+  (scale [_ x y]
+    (.scale g ^double x ^double y))
+
+  (rotate [_ a]
+    (.rotate g ^double a)))
 
 (defn create-image
   [w h]

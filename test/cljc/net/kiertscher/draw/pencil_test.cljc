@@ -146,6 +146,38 @@
     (p/clear-rect 10 10 180 30)
     (p/clear-rect 20 20 160 10)))
 
+(defn sketch-transform [ctx]
+  (let [pattern (fn [ctx]
+                  (doto ctx
+                    (p/set-line-style (p/line-style (p/color 0.5) 4))
+                    (p/draw-rect -10 -10 20 20)
+                    (p/set-line-style (p/line-style (p/color 0) 2))
+                    (p/draw-line -15 0 15 0)
+                    (p/draw-line 0 -15 0 15)
+                    (p/clear-rect -5 -5 10 10)
+                    (p/set-fill-style (p/fill-style (p/color 1 0 0)))
+                    (p/fill-rect -8 -8 7 7)
+                    (p/set-fill-style (p/fill-style (p/color 0 1 0)))
+                    (p/fill-rect 1 -8 7 7)
+                    (p/set-fill-style (p/fill-style (p/color 0 0 1)))
+                    (p/fill-rect -8 1 7 7)
+                    (p/set-fill-style (p/fill-style (p/color 1 1 0)))
+                    (p/fill-rect 1 1 7 7)))]
+    (doto ctx
+      (p/set-transform 1 0 0 1 25 25)
+      (pattern)
+      (p/reset-transform)
+      (p/translate 75 25)
+      (p/scale -2 1.5)
+      (pattern)
+      (p/reset-transform)
+      (p/transform 0.5 0 0 -0.5 125 25)
+      (p/transform 2 0 0 -2 0 0)
+      (p/rotate (* Math/PI 0.666))
+      (pattern)
+      (p/set-transform 1.2 0.1 -0.8 1.2 170 25)
+      (pattern))))
+
 (def test-sketches
   {:line-style {:f sketch-line-style :w 200 :h 100}
    :draw-line  {:f sketch-draw-line :w 200 :h 50}
@@ -154,4 +186,5 @@
    :draw-arc   {:f sketch-draw-arc :w 200 :h 50}
    :fill-arc   {:f sketch-fill-arc :w 200 :h 50}
    :draw-curve {:f sketch-draw-curve :w 200 :h 50}
-   :clear      {:f sketch-clear :w 200 :h 50}})
+   :clear      {:f sketch-clear :w 200 :h 50}
+   :transform  {:f sketch-transform :w 200 :h 50}})

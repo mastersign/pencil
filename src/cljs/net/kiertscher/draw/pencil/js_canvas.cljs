@@ -155,7 +155,24 @@
                 (if (pos? extend) start (+ start extend))
                 (if (pos? extend) (+ start extend) start))
       (.closePath)
-      (.fill))))
+      (.fill)))
+
+  core/ITransforming
+
+  (set-transform [_ a b c d e f]
+    (.setTransform g a b c d e f))
+
+  (transform [_ a b c d e f]
+    (.transform g a b c d e f))
+
+  (translate [_ x y]
+    (.translate g x y))
+
+  (scale [_ x y]
+    (.scale g x y))
+
+  (rotate [_ a]
+    (.rotate g a)))
 
 (defn draw
   [id f]

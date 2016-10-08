@@ -144,3 +144,30 @@
   (if (instance? FillStyle style)
     style
     (->FillStyle color)))
+
+(defprotocol ITransforming
+
+  (set-transform [_ a b c d e f]
+    "Sets the transformation matrix to:
+     | a c e |
+     | b d f |
+     | 0 0 1 |")
+
+  (transform [_ a b c d e f]
+    "Multiplies the current transformation matrix with:
+     | a c e |
+     | b d f |
+     | 0 0 1 |")
+
+  (translate [_ x y]
+    "Adds a translation to the current transformation.")
+
+  (scale [_ x y]
+    "Adds a scaling to the current transformation.")
+
+  (rotate [_ a]
+    "Adds a rotation in radians to the current transformation."))
+
+(defn reset-transform [ctx]
+  "Resets the transformation matrix to the identiy matrix."
+  (set-transform ctx 1 0 0 1 0 0))
