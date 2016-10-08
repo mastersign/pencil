@@ -171,3 +171,18 @@
 (defn reset-transform [ctx]
   "Resets the transformation matrix to the identiy matrix."
   (set-transform ctx 1 0 0 1 0 0))
+
+(defprotocol IClipping
+
+  (clip-rect [_ x y w h]
+    "Constraints further drawing to the inner of the given axis-align rectangle."))
+
+(defprotocol IStashing
+
+  (push-state [_]
+    "Pushes the current context state onto the stack.
+     The state contains draw and fill style, transformation and clipping.")
+
+  (pop-state [_]
+    "Pops the last context state from the stack.
+     The state contains draw and fill style, transformation and clipping."))

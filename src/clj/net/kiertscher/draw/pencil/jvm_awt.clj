@@ -44,19 +44,27 @@
 
 (defn- convert-line-join [v] (v line-joins))
 
-(defn- update-line-style
+(defn- update-current-state
+  [ctx k v]
+  (swap! (:state ctx) (fn [s] (assoc-in s [:current k] v))))
+
+(defn- get-current-state
+  [ctx k]
+  (get-in (deref (:state ctx)) [:current k]))
+
+(defn- apply-current-line-style
   [ctx]
   (let [g (:g ctx)
-        {:keys [color width line-cap line-join]} (:line-style (deref (:state ctx)))]
+        {:keys [color width line-cap line-join]} (get-current-state ctx :line-style)]
     (.setColor g (convert-color color))
     (.setStroke g (BasicStroke. width
                                 (convert-line-cap line-cap)
                                 (convert-line-join line-join)))))
 
-(defn- update-fill-style
+(defn- apply-current-fill-style
   [ctx]
   (let [g (:g ctx)
-        {:keys [color]} (:fill-style (deref (:state ctx)))]
+        {:keys [color]} (get-current-state ctx :fill-style)]
     (.setColor g (convert-color color))))
 
 (defn- clear-rect [g x y w h]
@@ -82,28 +90,27 @@
 
   core/IDrawing
 
-  (set-line-style [_ s]
-    (let [s' (core/make-up-line-style s)]
-      (swap! state (fn [s] (assoc s :line-style s'))))
+  (set-line-style [ctx s]
+    (update-current-state ctx :line-style (core/make-up-line-style s))
     nil)
 
   (draw-line [ctx x1 y1 x2 y2]
-    (update-line-style ctx)
+    (apply-current-line-style ctx)
     (let [s (Line2D$Double. x1 y1 x2 y2)]
       (.draw g s)))
 
   (draw-rect [ctx x y w h]
-    (update-line-style ctx)
+    (apply-current-line-style ctx)
     (let [s (Rectangle2D$Double. x y w h)]
       (.draw g s)))
 
   (draw-arc [ctx x y r]
-    (update-line-style ctx)
+    (apply-current-line-style ctx)
     (let [s (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))]
       (.draw g s)))
 
   (draw-arc [ctx x y r start extend]
-    (update-line-style ctx)
+    (apply-current-line-style ctx)
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))
               (Arc2D$Double. (- x r) (- y r) (* 2 r) (* 2 r)
@@ -113,12 +120,12 @@
       (.draw g s)))
 
   (draw-ellipse [ctx x y rx ry]
-    (update-line-style ctx)
+    (apply-current-line-style ctx)
     (let [s (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))]
       (.draw g s)))
 
   (draw-ellipse [ctx x y rx ry start extend]
-    (update-line-style ctx)
+    (apply-current-line-style ctx)
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
               (Arc2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
@@ -128,33 +135,33 @@
       (.draw g s)))
 
   (draw-quadratic-bezier [ctx x1 y1 cx cy x2 y2]
-    (update-line-style ctx)
+    (apply-current-line-style ctx)
     (let [s (QuadCurve2D$Double. x1 y1 cx cy x2 y2)]
       (.draw g s)))
 
   (draw-cubic-bezier [ctx x1 y1 cx1 cy1 cx2 cy2 x2 y2]
-    (update-line-style ctx)
+    (apply-current-line-style ctx)
     (let [s (CubicCurve2D$Double. x1 y1 cx1 cy1 cx2 cy2 x2 y2)]
       (.draw g s)))
 
   core/IFilling
 
-  (set-fill-style [_ s]
-    (let [s' (core/make-up-fill-style s)]
-      (swap! state (fn [s] (assoc s :fill-style s')))))
+  (set-fill-style [ctx s]
+    (update-current-state ctx :fill-style (core/make-up-fill-style s))
+    nil)
 
   (fill-rect [ctx x y w h]
-    (update-fill-style ctx)
+    (apply-current-fill-style ctx)
     (let [s (Rectangle2D$Double. x y w h)]
       (.fill g s)))
 
   (fill-arc [ctx x y r]
-    (update-fill-style ctx)
+    (apply-current-fill-style ctx)
     (let [s (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))]
       (.fill g s)))
 
   (fill-arc [ctx x y r start extend]
-    (update-fill-style ctx)
+    (apply-current-fill-style ctx)
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Double. (- x r) (- y r) (* 2 r) (* 2 r))
               (Arc2D$Double. (- x r) (- y r) (* 2 r) (* 2 r)
@@ -164,12 +171,12 @@
       (.fill g s)))
 
   (fill-ellipse [ctx x y rx ry]
-    (update-fill-style ctx)
+    (apply-current-fill-style ctx)
     (let [s (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))]
       (.fill g s)))
 
   (fill-ellipse [ctx x y rx ry start extend]
-    (update-fill-style ctx)
+    (apply-current-fill-style ctx)
     (let [s (if (>= (Math/abs ^double extend) (* 2 Math/PI))
               (Ellipse2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry))
               (Arc2D$Double. (- x rx) (- y ry) (* 2 rx) (* 2 ry)
@@ -180,26 +187,52 @@
 
   core/ITransforming
 
-  (set-transform [_ a b c d e f]
+  (set-transform [ctx a b c d e f]
     (let [t (AffineTransform. ^double a ^double b
                               ^double c ^double d
                               ^double e ^double f)]
-      (.setTransform g t)))
+      (.setTransform g t)
+      (update-current-state ctx :transform t)))
 
-  (transform [_ a b c d e f]
+  (transform [ctx a b c d e f]
     (let [t (AffineTransform. ^double a ^double b
                               ^double c ^double d
                               ^double e ^double f)]
-      (.transform g t)))
+      (.transform g t))
+    (update-current-state ctx :transform (.getTransform g)))
 
-  (translate [_ x y]
-    (.translate g ^double x ^double y))
+  (translate [ctx x y]
+    (.translate g ^double x ^double y)
+    (update-current-state ctx :transform (.getTransform g)))
 
-  (scale [_ x y]
-    (.scale g ^double x ^double y))
+  (scale [ctx x y]
+    (.scale g ^double x ^double y)
+    (update-current-state ctx :transform (.getTransform g)))
 
-  (rotate [_ a]
-    (.rotate g ^double a)))
+  (rotate [ctx a]
+    (.rotate g ^double a)
+    (update-current-state ctx :transform (.getTransform g)))
+
+  core/IClipping
+
+  (clip-rect [ctx x y w h]
+    (let [s (Rectangle2D$Double. x y w h)]
+      (.clip g s))
+    (update-current-state ctx :clipping (.getClip g)))
+
+  core/IStashing
+
+  (push-state [_]
+    (swap! state (fn [s] (assoc s :stack (conj (:stack s) (:current s))))))
+
+  (pop-state [ctx]
+    (swap! state (fn [s] (if (not (empty? (:stack s)))
+                           (-> s
+                               (assoc :current (last (:stack s)))
+                               (assoc :stack (pop (:stack s))))
+                           s)))
+    (.setTransform g (get-current-state ctx :transform))
+    (.setClip g (get-current-state ctx :clipping))))
 
 (defn create-image
   [w h]
@@ -211,9 +244,12 @@
     (ImageIO/write img type f)))
 
 (defn- initial-state-atom
-  []
-  (atom {:line-style (core/line-style)
-         :fill-style (core/fill-style)}))
+  [w h]
+  (atom {:stack   []
+         :current {:line-style (core/line-style)
+                   :fill-style (core/fill-style)
+                   :transform  (AffineTransform.)
+                   :clipping   nil}}))
 
 (defn draw
   [^BufferedImage img f]
@@ -221,7 +257,7 @@
     (doto g
       (.setRenderingHint RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_ON)
       (.setRenderingHint RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_PURE))
-    (let [ctx (->JavaAwtContext img g (initial-state-atom))]
+    (let [ctx (->JavaAwtContext img g (initial-state-atom (.getWidth img) (.getHeight img)))]
       (f ctx))
     (.dispose g)))
 

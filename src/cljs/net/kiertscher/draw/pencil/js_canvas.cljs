@@ -172,7 +172,23 @@
     (.scale g x y))
 
   (rotate [_ a]
-    (.rotate g a)))
+    (.rotate g a))
+
+  core/IClipping
+
+  (clip-rect [_ x y w h]
+    (doto g
+      (.beginPath)
+      (.rect x y w h)
+      (.clip)))
+
+  core/IStashing
+
+  (push-state [_]
+    (.save g))
+
+  (pop-state [_]
+    (.restore g)))
 
 (defn draw
   [id f]

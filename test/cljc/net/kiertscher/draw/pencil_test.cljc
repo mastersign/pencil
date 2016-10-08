@@ -178,13 +178,37 @@
       (p/set-transform 1.2 0.1 -0.8 1.2 170 25)
       (pattern))))
 
+(defn sketch-clip-and-stash [ctx]
+  (doto ctx
+    (p/set-fill-style (p/fill-style (p/color 0.2 0.8 0)))
+    (p/set-line-style (p/line-style (p/color 0) 1))
+    (p/translate 100 25)
+    (p/push-state)
+    (p/set-fill-style (p/fill-style (p/color 1 0 0)))
+    (p/set-line-style (p/line-style (p/color 0 0.7 0) 3))
+    (p/reset-transform)
+    (p/push-state)
+    (p/translate 25 25)
+    (p/clip-rect -15 -15 30 30)
+    (p/set-line-style (p/line-style))
+    (p/draw-rect -5 -20 10 40)
+    (p/draw-rect -20 -5 40 10)
+    (p/set-fill-style (p/fill-style (p/color 0 0.4 0.9 0.5)))
+    (p/fill-rect -5 -5 10 10)
+    (p/pop-state)
+    (p/draw-line 0 0 200 50)
+    (p/pop-state)
+    (p/clip-rect -18 -18 36 36)
+    (p/fill-arc 0 0 20)))
+
 (def test-sketches
-  {:line-style {:f sketch-line-style :w 200 :h 100}
-   :draw-line  {:f sketch-draw-line :w 200 :h 50}
-   :draw-rect  {:f sketch-draw-rect :w 200 :h 50}
-   :fill-rect  {:f sketch-fill-rect :w 200 :h 50}
-   :draw-arc   {:f sketch-draw-arc :w 200 :h 50}
-   :fill-arc   {:f sketch-fill-arc :w 200 :h 50}
-   :draw-curve {:f sketch-draw-curve :w 200 :h 50}
-   :clear      {:f sketch-clear :w 200 :h 50}
-   :transform  {:f sketch-transform :w 200 :h 50}})
+  {:line-style     {:f sketch-line-style :w 200 :h 100}
+   :draw-line      {:f sketch-draw-line :w 200 :h 50}
+   :draw-rect      {:f sketch-draw-rect :w 200 :h 50}
+   :fill-rect      {:f sketch-fill-rect :w 200 :h 50}
+   :draw-arc       {:f sketch-draw-arc :w 200 :h 50}
+   :fill-arc       {:f sketch-fill-arc :w 200 :h 50}
+   :draw-curve     {:f sketch-draw-curve :w 200 :h 50}
+   :clear          {:f sketch-clear :w 200 :h 50}
+   :transform      {:f sketch-transform :w 200 :h 50}
+   :clip-and-stash {:f sketch-clip-and-stash :w 200 :h 50}})
