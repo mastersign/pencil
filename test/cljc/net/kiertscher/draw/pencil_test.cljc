@@ -136,6 +136,16 @@
   (doseq [cr test-catmull-roms]
     (apply p/draw-catmull-rom ctx cr)))
 
+(defn sketch-clear [ctx]
+  (doto ctx
+    (p/set-fill-style (p/fill-style (p/color 0.5 0.7 0.9 0.8)))
+    (p/fill-rect 0 20 200 10)
+    (p/fill-rect 20 0 160 50)
+    (p/clear-all)
+    (p/fill-rect 0 0 200 50)
+    (p/clear-rect 10 10 180 30)
+    (p/clear-rect 20 20 160 10)))
+
 (def test-sketches
   {:line-style {:f sketch-line-style :w 200 :h 100}
    :draw-line  {:f sketch-draw-line :w 200 :h 50}
@@ -143,4 +153,5 @@
    :fill-rect  {:f sketch-fill-rect :w 200 :h 50}
    :draw-arc   {:f sketch-draw-arc :w 200 :h 50}
    :fill-arc   {:f sketch-fill-arc :w 200 :h 50}
-   :draw-curve {:f sketch-draw-curve :w 200 :h 50}})
+   :draw-curve {:f sketch-draw-curve :w 200 :h 50}
+   :clear      {:f sketch-clear :w 200 :h 50}})

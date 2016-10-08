@@ -26,7 +26,7 @@
        ")"))
 
 (defrecord HtmlCanvasContext
-  [id g]
+  [id width height g]
 
   core/IClearing
 
@@ -35,7 +35,7 @@
     ctx)
 
   (clear-all [ctx]
-    (.clear g)
+    (.clearRect g 0 0 width height)
     ctx)
 
   core/IDrawing
@@ -161,7 +161,7 @@
   [id f]
   (let [el (.getElementById js/document id)
         ctx (.getContext el "2d")]
-    (doto (->HtmlCanvasContext id ctx)
+    (doto (->HtmlCanvasContext id (.-width el) (.-height el) ctx)
         (core/set-line-style (core/line-style))
         (core/set-fill-style (core/fill-style))
         (f))))
