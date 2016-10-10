@@ -145,6 +145,53 @@
     style
     (->FillStyle color)))
 
+(defprotocol IPathRendering
+
+  (begin-path [_]
+    "Begins a new path.")
+
+  (path-close [_]
+    "Closes the current path to a loop by connecting the last position
+     and the beginning of the path with a straight line.")
+
+  (path-move-to [_ x y]
+    "Moves the last position in the current path to the given location.")
+
+  (path-line-to [_ x y]
+    "Adds a straight line to the current path, connecting the last position
+    and the given location.")
+
+  (path-quadratic-curve-to [_ cx cy x y]
+    "Adds a quadratic Bézier curve to the current path.
+     The beginning of the curve is the last position.")
+
+  (path-cubic-curve-to [_ cx1 cy1 cx2 cy2 x y]
+    "Adds a cubic Bézier curve to the current path.
+     The beginning of the curve is the last position.")
+
+  (path-arc [_ x y r] [_ x y r start extend]
+    "Adds an arc around a center point to the current path.
+    If the current path is not empty, the last position is connected
+    to the beginning of the arc by a straight line.")
+
+  (path-ellipse [_ x y rx ry] [_ x y rx ry start extend]
+    "Adds an axis-aligned ellipse around a center point to the current path.
+     If the current path is not empty, the last position is connected
+     to the beginning of the ellipse by a straight line.")
+
+  (draw-path [_]
+    "Draws the current path.")
+
+  (fill-path [_] [_ rule]
+    "Fills the current path.
+     The rule can be :non-zero or :even-odd.
+     The default rule is :non-zero.")
+
+  (clip-path [_] [_ rule]
+    "Constraints the clipping region with the current path.
+     The rule can be :non-zero or :even-odd.
+     The default rule is :non-zero."))
+
 (defprotocol ITransforming
 
   (set-transform [_ a b c d e f]

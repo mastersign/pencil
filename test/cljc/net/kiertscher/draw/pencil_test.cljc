@@ -136,6 +136,51 @@
   (doseq [cr test-catmull-roms]
     (apply p/draw-catmull-rom ctx cr)))
 
+(defn test-path-pattern [ctx]
+  (doto ctx
+    (p/path-arc 25 25 20)
+    (p/begin-path)
+    (p/path-move-to 10 10)
+    (p/path-arc 50 10 15 Math/PI (- Math/PI))
+    (p/path-line-to 80 10)
+    (p/path-quadratic-curve-to 130 10 130 30)
+    (p/path-cubic-curve-to 130 40 110 40 80 40)
+    (p/path-ellipse 50 40 20 5 0 Math/PI)
+    (p/path-line-to 10 40)
+    (p/path-close)
+    (p/path-arc 15 25 10)
+    (p/path-line-to 25 40)
+    (p/path-move-to 150 10)
+    (p/path-line-to 135 25)
+    (p/path-line-to 150 40)
+    (p/path-line-to 185 25)
+    (p/path-close)
+    (p/path-move-to 150 20)
+    (p/path-line-to 140 25)
+    (p/path-line-to 150 30)
+    (p/path-line-to 175 25)
+    (p/path-close)))
+
+(defn sketch-draw-path [ctx]
+  (doto ctx
+    (p/set-line-style (p/line-style))
+    (test-path-pattern)
+    (p/draw-path)))
+
+(defn sketch-fill-path [ctx]
+  (doto ctx
+    (p/set-fill-style (p/fill-style))
+    (test-path-pattern)
+    (p/fill-path :even-odd)))
+
+(defn sketch-clip-path [ctx]
+  (doto ctx
+    (test-path-pattern)
+    (p/clip-path :non-zero)
+    (p/set-line-style (p/line-style)))
+  (doseq [y (range 0.5 50 2)]
+    (p/draw-line ctx 0 y 200 y)))
+
 (defn sketch-clear [ctx]
   (doto ctx
     (p/set-fill-style (p/fill-style (p/color 0.5 0.7 0.9 0.8)))
@@ -209,6 +254,9 @@
    :draw-arc       {:f sketch-draw-arc :w 200 :h 50}
    :fill-arc       {:f sketch-fill-arc :w 200 :h 50}
    :draw-curve     {:f sketch-draw-curve :w 200 :h 50}
+   :draw-path      {:f sketch-draw-path :w 200 :h 50}
+   :fill-path      {:f sketch-fill-path :w 200 :h 50}
+   :clip-path      {:f sketch-clip-path :w 200 :h 50}
    :clear          {:f sketch-clear :w 200 :h 50}
    :transform      {:f sketch-transform :w 200 :h 50}
    :clip-and-stash {:f sketch-clip-and-stash :w 200 :h 50}})

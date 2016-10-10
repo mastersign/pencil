@@ -7,7 +7,7 @@
 (defn draw
   [id w h f]
   (.mkdirs (File. "out/test/awt"))
-  (awt/draw-in-file
+  (awt/render-in-file
     (str "out/test/awt/" id ".png") "PNG"
     w h f)  )
 

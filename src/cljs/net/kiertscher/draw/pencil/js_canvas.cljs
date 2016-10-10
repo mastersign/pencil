@@ -71,9 +71,7 @@
   (draw-arc [_ x y r start extend]
     (doto g
       (.beginPath)
-      (.arc x y r
-            (if (pos? extend) start (+ start extend))
-            (if (pos? extend) (+ start extend) start)))
+      (.arc x y r start (+ start extend) (neg? extend)))
     (when (>= (Math/abs extend) (* 2 Math/PI))
       (.closePath g))
     (.stroke g))
@@ -88,9 +86,7 @@
   (draw-ellipse [_ x y rx ry start extend]
     (doto g
       (.beginPath)
-      (.ellipse x y rx ry 0
-                (if (pos? extend) start (+ start extend))
-                (if (pos? extend) (+ start extend) start)))
+      (.ellipse x y rx ry 0 start (+ start extend) (neg? extend)))
     (when (>= (Math/abs extend) (* 2 Math/PI))
       (.closePath g))
     (.stroke g))
@@ -133,9 +129,7 @@
     (when (< (Math/abs extend) (* 2 Math/PI))
       (.moveTo g x y))
     (doto g
-      (.arc x y r
-            (if (pos? extend) start (+ start extend))
-            (if (pos? extend) (+ start extend) start))
+      (.arc x y r start (+ start extend) (neg? extend))
       (.closePath)
       (.fill)))
 
@@ -151,11 +145,78 @@
     (when (< (Math/abs extend) (* 2 Math/PI))
       (.moveTo g x y))
     (doto g
-      (.ellipse x y rx ry 0
-                (if (pos? extend) start (+ start extend))
-                (if (pos? extend) (+ start extend) start))
+      (.ellipse x y rx ry 0 start (+ start extend) (neg? extend))
       (.closePath)
       (.fill)))
+
+  core/IPathRendering
+
+  (begin-path [_]
+    (.beginPath g))
+
+  (path-close [_]
+    (.closePath g))
+
+  (path-move-to [_ x y]
+    (.moveTo g x y))
+
+  (path-line-to [_ x y]
+    (.lineTo g x y))
+
+  (path-quadratic-curve-to [_ cx cy x y]
+    (.quadraticCurveTo g cx cy x y))
+
+  (path-cubic-curve-to [_ cx1 cy1 cx2 cy2 x y]
+    (.bezierCurveTo g cx1 cy1 cx2 cy2 x y))
+
+  (path-arc [_ x y r]
+    (doto g
+      (.moveTo (+ x r) y)
+      (.arc  x y r 0 (* 2 Math/PI))
+      (.closePath)))
+
+  (path-arc [_ x y r start extend]
+    (if (>= (Math/abs extend) (* 2 Math/PI))
+      (doto g
+        (.moveTo (+ x r) y)
+        (.arc x y r 0 (* 2 Math/PI))
+        (.closePath))
+      (.arc g x y r
+            start
+            (+ start extend)
+            (neg? extend))))
+
+  (path-ellipse [_ x y rx ry]
+    (doto g
+      (.moveTo (+ x rx) y)
+      (.ellipse x y rx ry 0 0 (* 2 Math/PI))
+      (.closePath)))
+
+  (path-ellipse [_ x y rx ry start extend]
+    (if (>= (Math/abs extend) (* 2 Math/PI))
+      (doto g
+        (.moveTo (+ x rx) y)
+        (.ellipse x y rx ry 0 (* 2 Math/PI))
+        (.closePath))
+      (.ellipse g x y rx ry 0
+                start
+                (+ start extend)
+                (neg? extend))))
+
+  (draw-path [_]
+    (.stroke g))
+
+  (fill-path [_]
+    (.fill g))
+
+  (fill-path [_ rule]
+    (.fill g (if (= rule :even-odd) "evenodd" "nonzero")))
+
+  (clip-path [_]
+    (.clip g))
+
+  (clip-path [_ rule]
+    (.clip g (if (= rule :even-odd) "evenodd" "nonzero")))
 
   core/ITransforming
 
@@ -190,11 +251,11 @@
   (pop-state [_]
     (.restore g)))
 
-(defn draw
+(defn render
   [id f]
   (let [el (.getElementById js/document id)
         ctx (.getContext el "2d")]
     (doto (->HtmlCanvasContext id (.-width el) (.-height el) ctx)
-        (core/set-line-style (core/line-style))
-        (core/set-fill-style (core/fill-style))
-        (f))))
+      (core/set-line-style (core/line-style))
+      (core/set-fill-style (core/fill-style))
+      (f))))

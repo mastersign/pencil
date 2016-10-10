@@ -7,7 +7,7 @@
   (let [e (.getElementById js/document id)]
     (set! (.-width e) w)
     (set! (.-height e) h))
-  (jsc/draw id f))
+  (jsc/render id f))
 
 (defn- get-el
   [id]
