@@ -130,9 +130,9 @@
 (defn sketch-draw-curve [ctx]
   (p/set-line-style ctx (p/line-style))
   (doseq [b test-quadratic-beziers]
-    (apply p/draw-quadratic-bezier ctx b))
+    (apply p/draw-quadratic-curve ctx b))
   (doseq [b test-cubic-beziers]
-    (apply p/draw-cubic-bezier ctx b))
+    (apply p/draw-cubic-curve ctx b))
   (doseq [cr test-catmull-roms]
     (apply p/draw-catmull-rom ctx cr)))
 

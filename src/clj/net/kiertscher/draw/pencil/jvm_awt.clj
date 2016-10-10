@@ -171,12 +171,12 @@
     (let [s (build-ellipse x y rx ry start extend)]
       (.draw g s)))
 
-  (draw-quadratic-bezier [ctx x1 y1 cx cy x2 y2]
+  (draw-quadratic-curve [ctx x1 y1 cx cy x2 y2]
     (apply-current-line-style ctx)
     (let [s (QuadCurve2D$Double. x1 y1 cx cy x2 y2)]
       (.draw g s)))
 
-  (draw-cubic-bezier [ctx x1 y1 cx1 cy1 cx2 cy2 x2 y2]
+  (draw-cubic-curve [ctx x1 y1 cx1 cy1 cx2 cy2 x2 y2]
     (apply-current-line-style ctx)
     (let [s (CubicCurve2D$Double. x1 y1 cx1 cy1 cx2 cy2 x2 y2)]
       (.draw g s)))
