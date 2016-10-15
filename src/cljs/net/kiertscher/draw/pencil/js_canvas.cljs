@@ -28,6 +28,10 @@
 (defrecord HtmlCanvasContext
   [id width height g]
 
+  core/IInformation
+  (canvas-size [_]
+    [width height])
+
   core/IClearing
 
   (clear-rect [ctx x y w h]

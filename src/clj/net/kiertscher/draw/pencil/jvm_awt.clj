@@ -125,6 +125,12 @@
    ^Graphics2D g
    state]
 
+  core/IInformation
+
+  (canvas-size [_]
+    [(.getWidth img)
+     (.getHeight img)])
+
   core/IClearing
 
   (clear-rect [ctx x y w h]

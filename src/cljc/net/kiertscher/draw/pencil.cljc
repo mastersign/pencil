@@ -20,6 +20,10 @@
 (def ^:dynamic *default-line-join* :miter)
 (def ^:dynamic *default-fill-color* (color 0.75))
 
+(defprotocol IInformation
+  (canvas-size [_]
+    "Returns a vector with the width and the height of the canvas."))
+
 (defprotocol IClearing
 
   (clear-rect [_ x y w h]
