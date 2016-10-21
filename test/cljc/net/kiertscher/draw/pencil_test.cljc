@@ -193,7 +193,7 @@
     (p/clear-rect 10 20 180 10)
     (p/clear-rect 20 20 10 10 (p/color 0.0 1.0 0.0 0.5))))
 
-(defn- test-axis-pattern [ctx]
+(defn- test-box-pattern [ctx]
   (doto ctx
     (p/set-line-style (p/line-style (p/color 0.5 0.5) 4))
     (p/draw-rect -10 -10 20 20)
@@ -213,18 +213,18 @@
 (defn sketch-transform [ctx]
   (doto ctx
     (p/set-transform 1 0 0 1 25 25)
-    (test-axis-pattern)
+    (test-box-pattern)
     (p/reset-transform)
     (p/translate 75 25)
     (p/scale -2 1.5)
-    (test-axis-pattern)
+    (test-box-pattern)
     (p/reset-transform)
     (p/transform 0.5 0 0 -0.5 125 25)
     (p/transform 2 0 0 -2 0 0)
     (p/rotate (* Math/PI 0.666))
-    (test-axis-pattern)
+    (test-box-pattern)
     (p/set-transform 1.2 0.1 -0.8 1.2 170 25)
-    (test-axis-pattern)))
+    (test-box-pattern)))
 
 (defn sketch-clip-and-stash [ctx]
   (doto ctx
@@ -254,21 +254,21 @@
                    :rows 2
                    :margin [20 5 10]
                    :cell-spacing [4 3])
-        a (l/axis :range-x [-10 10] :range-y [10 -10])
-        p test-axis-pattern]
+        b (l/box :range-x [-10 10] :range-y [10 -10])
+        p test-box-pattern]
     (l/render-with-layout ctx
                           (l/table-cell-layout :table t
-                                               :axis a)
+                                               :box b)
                           p)
     (l/render-with-layout ctx
                           (l/table-cell-layout :table t
-                                               :axis (l/axis (merge a {:align-y :near}))
+                                               :box (l/box (merge b {:align-y :near}))
                                                :column 0
                                                :row 1
                                                :column-span 2)
                           p)
     (l/render-with-layout ctx (l/table-cell-layout :table t
-                                                   :axis a
+                                                   :box b
                                                    :column 1
                                                    :row 0
                                                    :column-span 2
@@ -280,7 +280,7 @@
                    :rows 4
                    :margin 2
                    :cell-spacing 2)
-        a (l/axis :range-x [-5 +15] :range-y [+15 -5])
+        b (l/box :range-x [-5 +15] :range-y [+15 -5])
         p (fn [ctx] (doto ctx
                       (p/set-fill-style (p/fill-style (p/color 0 0.25)))
                       (p/fill-rect -5 -5 20 20)
@@ -292,29 +292,29 @@
                       (p/draw-line 5 -20 5 +30)
                       (p/draw-arc 5 5 10)
                       (p/draw-arc 0 0 2)))
-        cells [{:column 0 :row 0 :axis {:align-x :stretch :align-y :stretch}}
-               {:column 1 :row 0 :axis {:align-x :near :align-y :stretch}}
-               {:column 2 :row 0 :axis {:align-x :center :align-y :stretch}}
-               {:column 3 :row 0 :axis {:align-x :far :align-y :stretch}}
-               {:column 0 :row 1 :axis {:align-x :stretch :align-y :near}}
-               {:column 1 :row 1 :axis {:align-x :near :align-y :near}}
-               {:column 2 :row 1 :axis {:align-x :center :align-y :near}}
-               {:column 3 :row 1 :axis {:align-x :far :align-y :near}}
-               {:column 0 :row 2 :axis {:align-x :stretch :align-y :center}}
-               {:column 1 :row 2 :axis {:align-x :near :align-y :center}}
-               {:column 2 :row 2 :axis {:align-x :center :align-y :center}}
-               {:column 3 :row 2 :axis {:align-x :far :align-y :center}}
-               {:column 0 :row 3 :axis {:align-x :stretch :align-y :far}}
-               {:column 1 :row 3 :axis {:align-x :near :align-y :far}}
-               {:column 2 :row 3 :axis {:align-x :center :align-y :far}}
-               {:column 3 :row 3 :axis {:align-x :far :align-y :far}}]]
+        cells [{:column 0 :row 0 :box {:align-x :stretch :align-y :stretch}}
+               {:column 1 :row 0 :box {:align-x :near :align-y :stretch}}
+               {:column 2 :row 0 :box {:align-x :center :align-y :stretch}}
+               {:column 3 :row 0 :box {:align-x :far :align-y :stretch}}
+               {:column 0 :row 1 :box {:align-x :stretch :align-y :near}}
+               {:column 1 :row 1 :box {:align-x :near :align-y :near}}
+               {:column 2 :row 1 :box {:align-x :center :align-y :near}}
+               {:column 3 :row 1 :box {:align-x :far :align-y :near}}
+               {:column 0 :row 2 :box {:align-x :stretch :align-y :center}}
+               {:column 1 :row 2 :box {:align-x :near :align-y :center}}
+               {:column 2 :row 2 :box {:align-x :center :align-y :center}}
+               {:column 3 :row 2 :box {:align-x :far :align-y :center}}
+               {:column 0 :row 3 :box {:align-x :stretch :align-y :far}}
+               {:column 1 :row 3 :box {:align-x :near :align-y :far}}
+               {:column 2 :row 3 :box {:align-x :center :align-y :far}}
+               {:column 3 :row 3 :box {:align-x :far :align-y :far}}]]
     (doseq [c cells]
       (l/render-with-layout
         ctx
         (l/table-cell-layout :table t
                              :column (:column c)
                              :row (:row c)
-                             :axis (l/axis (merge a (:axis c))))
+                             :box (l/box (merge b (:box c))))
         p))))
 
 (def test-sketches

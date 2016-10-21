@@ -2,7 +2,9 @@
   (:require [net.kiertscher.draw.pencil :as p]))
 
 (defprotocol ILayout
-  (apply-layout [_ ctx]))
+  (apply-layout [_ ctx])
+
+  (scale [_ x y]))
 
 (defn render-with-layout
   [ctx layout f]
@@ -28,6 +30,18 @@
          [v v]))
   ([x y] [x y]))
 
+(defn- scale-border*
+  [[left top right bottom] sx sy]
+  [(* sx left)
+   (* sy top)
+   (* sx right)
+   (* sy bottom)])
+
+(defn- scale-spacing*
+  [[x y] sx sy]
+  [(* sx x)
+   (* sy y)])
+
 (defrecord Table
   [columns                                                  ;; the number of columns
    rows                                                     ;; the number of rows
@@ -52,31 +66,31 @@
   ([k v & kvps]
    (table (apply hash-map k v kvps))))
 
-(defrecord Axis
+(defrecord CellBox
   [range-x                                                  ;; vector with left and right
    range-y                                                  ;; vector with top and bottom
    align-x                                                  ;; :center, :near, :far, :stretch
    align-y])                                                ;; :center, :near, :far, :stretch
 
-(def ^:dynamic *default-axis*
+(def ^:dynamic *default-box*
   {:range-x [-1.0 +1.0]
    :range-y [+1.0 -1.0]
    :align-x :stretch
    :align-y :stretch})
 
-(defn axis
-  ([] (axis *default-axis*))
+(defn box
+  ([] (box *default-box*))
   ([m]
    (let [{rx :range-x
           ry :range-y
           ax :align-x
           ay :align-y}
-         (merge *default-axis* m)]
-     (Axis. rx ry ax ay)))
+         (merge *default-box* m)]
+     (CellBox. rx ry ax ay)))
   ([k v & kvps]
-   (axis (apply hash-map k v kvps))))
+   (box (apply hash-map k v kvps))))
 
-(defn- axis-transform [s1 s2 v1 v2 d a1 a2]
+(defn- box-transform [s1 s2 v1 v2 d a1 a2]
   (let [sign (fn [v] (if (< v 0.0) -1.0 1.0))]
     (if (= a1 :stretch)
       [(* s1 (- v1)) s1]
@@ -90,7 +104,7 @@
           :far [(- d (* s v2)) s]
           [0 0])))))
 
-(defn- axis-transform-2
+(defn- box-transform-2
   [cw ch {[x-l x-r] :range-x
           [y-t y-b] :range-y
           ax        :align-x
@@ -99,18 +113,18 @@
         ady (- y-b y-t)
         sx (/ cw adx)
         sy (/ ch ady)]
-    (let [[tx sx'] (axis-transform sx sy x-l x-r cw ax ay)
-          [ty sy'] (axis-transform sy sx y-t y-b ch ay ax)]
+    (let [[tx sx'] (box-transform sx sy x-l x-r cw ax ay)
+          [ty sy'] (box-transform sy sx y-t y-b ch ay ax)]
       [tx ty sx' sy'])))
 
 (defrecord TableCellLayout
   [table                                                    ;; a Table instance
-   axis                                                     ;; an Axis instance
+   box                                                      ;; an Box instance
    column                                                   ;; the start column of the cell
    row                                                      ;; the start row of the cell
    column-span                                              ;; the number of columns spanned by the cell
    row-span                                                 ;; the number of rows spanned by the cell
-   clip]                                                    ;; clip mode :none, :cell, :axis
+   clip]                                                    ;; clip mode :none, :cell, :box
 
   ILayout
 
@@ -118,10 +132,10 @@
     (let [[can-w can-h] (p/canvas-size ctx)
           cols (:columns table)                             ;; number of columns
           rows (:rows table)                                ;; number of rows
-          [ml mt mr mb] (:margin table)                     ;; outer margin on x-axis
-          [csx csy] (:cell-spacing table)                   ;; spacing between cells on x-axis
-          dx (+ ml mr (* (dec cols) csx))                   ;; total margin and spacing on x-axis
-          dy (+ mt mb (* (dec rows) csy))                   ;; total margin and spacing on y-axis
+          [ml mt mr mb] (:margin table)                     ;; outer margin on x-box
+          [csx csy] (:cell-spacing table)                   ;; spacing between cells on x-box
+          dx (+ ml mr (* (dec cols) csx))                   ;; total margin and spacing on x-box
+          dy (+ mt mb (* (dec rows) csy))                   ;; total margin and spacing on y-box
           cw (/ (- can-w dx) cols)                          ;; cell width
           ch (/ (- can-h dy) rows)                          ;; cell height
           ccw (+ (* cw column-span)                         ;; current cell width
@@ -133,20 +147,24 @@
       (p/translate ctx ccx ccy)
       (when (= clip :cell)
         (p/clip-rect ctx 0 0 ccw cch))
-      (when axis
-        (let [[tx ty sx sy] (axis-transform-2 ccw cch axis)]
+      (when box
+        (let [[tx ty sx sy] (box-transform-2 ccw cch box)]
           (p/translate ctx tx ty)
           (p/scale ctx sx sy)
-          (when (= clip :axis)
+          (when (= clip :box)
             (let [{[x-l x-r] :range-x
-                   [y-t y-b] :range-y} axis]
+                   [y-t y-b] :range-y} box]
               (p/clip-rect ctx
                            (- x-l) (- y-t)
-                           (- x-r x-l) (- y-b y-t)))))))))
+                           (- x-r x-l) (- y-b y-t))))))))
+
+  (scale [_ x y]
+    (merge _ {:table (merge table {:margin (scale-border* (:margin table) x y)
+                                   :cell-spacing (scale-spacing* (:cell-spacing table) x y)})})))
 
 (def ^:dynamic *default-table-cell-layout*
   {:table       (table)
-   :axis        nil
+   :box         nil
    :column      0
    :row         0
    :column-span 1
@@ -157,7 +175,7 @@
   ([] (table-cell-layout *default-table-cell-layout*))
   ([m]
    (let [{t  :table
-          a  :axis
+          a  :box
           c  :column
           r  :row
           cs :column-span
