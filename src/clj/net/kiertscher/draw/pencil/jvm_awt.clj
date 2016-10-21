@@ -133,13 +133,25 @@
 
   core/IClearing
 
-  (clear-rect [ctx x y w h]
-    (clear-rect g x y w h)
-    ctx)
+  (clear-rect [_ x y w h]
+    (clear-rect g x y w h))
 
-  (clear-all [ctx]
-    (clear-rect g 0 0 (.getWidth img) (.getHeight img))
-    ctx)
+  (clear-rect [_ x y w h c]
+    (clear-rect g x y w h)
+    (.setColor g (convert-color c))
+    (.fillRect g x y w h))
+
+  (clear-all [_]
+    (let [w (.getWidth img)
+          h (.getHeight img)]
+      (clear-rect g 0 0 w h)))
+  
+  (clear-all [_ c]
+    (let [w (.getWidth img)
+          h (.getHeight img)]
+      (clear-rect g 0 0 w h)
+      (.setColor g (convert-color c))
+      (.fillRect g 0 0 w h)))
 
   core/IDrawing
 

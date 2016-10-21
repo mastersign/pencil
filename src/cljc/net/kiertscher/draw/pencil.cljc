@@ -26,11 +26,11 @@
 
 (defprotocol IClearing
 
-  (clear-rect [_ x y w h]
-    "Resets a rectangle to transparent black.")
+  (clear-rect [_ x y w h] [_ x y w h c]
+    "Resets a rectangle to a given color or transparent black.")
 
-  (clear-all [_]
-    "Resets the entire drawing to transparent black."))
+  (clear-all [_] [_ c]
+    "Resets the entire drawing to a given color or transparent black."))
 
 (defprotocol IDrawing
 

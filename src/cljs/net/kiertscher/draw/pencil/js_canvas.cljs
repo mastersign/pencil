@@ -34,13 +34,25 @@
 
   core/IClearing
 
-  (clear-rect [ctx x y w h]
-    (.clearRect g x y w h)
-    ctx)
+  (clear-rect [_ x y w h]
+    (.clearRect g x y w h))
 
-  (clear-all [ctx]
+  (clear-rect [_ x y w h c]
+    (.clearRect g x y w h)
+    (let [fill-style (.-fillStyle g)]
+      (set! (.-fillStyle g) (color->css c))
+      (.fillRect g x y w h)
+      (set! (.-fillStyle g) fill-style)))
+
+  (clear-all [_]
+    (.clearRect g 0 0 width height))
+
+  (clear-all [_ c]
     (.clearRect g 0 0 width height)
-    ctx)
+    (let [fill-style (.-fillStyle g)]
+      (set! (.-fillStyle g) (color->css c))
+      (.fillRect g 0 0 width height)
+      (set! (.-fillStyle g) fill-style)))
 
   core/IDrawing
 

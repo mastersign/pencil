@@ -189,8 +189,9 @@
     (p/fill-rect 20 0 160 50)
     (p/clear-all)
     (p/fill-rect 0 0 200 50)
-    (p/clear-rect 10 10 180 30)
-    (p/clear-rect 20 20 160 10)))
+    (p/clear-rect 20 10 160 30)
+    (p/clear-rect 10 20 180 10)
+    (p/clear-rect 20 20 10 10 (p/color 0.0 1.0 0.0 0.5))))
 
 (defn- test-axis-pattern [ctx]
   (doto ctx
