@@ -116,10 +116,10 @@
   (if (instance? LineStyle style)
     style
     (let [{:keys [color width line-cap line-join]
-           :or   {:color     *default-line-color*
-                  :width     *default-line-width*
-                  :line-cap  *default-line-cap*
-                  :line-join *default-line-join*}} style]
+           :or   {color     *default-line-color*
+                  width     *default-line-width*
+                  line-cap  *default-line-cap*
+                  line-join *default-line-join*}} style]
       (->LineStyle color width line-cap line-join))))
 
 (defprotocol IFilling
@@ -147,7 +147,7 @@
 
 (defn make-up-fill-style
   [{:keys [color]
-    :or   {:color *default-fill-color*}
+    :or   {color *default-fill-color*}
     :as   style}]
   (if (instance? FillStyle style)
     style
