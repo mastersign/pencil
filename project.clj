@@ -13,5 +13,6 @@
                :dev  {:source-paths ["src/cljc" "src/cljs" "test/cljc" "test/cljs"]
                       :compiler      {:output-to     "out/js/pencil-test.js"
                                       :optimizations :whitespace}}}}
-  :source-paths ["src/cljc" "src/clj"]
-  :test-paths ["test/cljc" "test/clj"])
+  :source-paths ["src/cljc" "src/clj" "src/cljs"]
+  :test-paths ["test/cljc" "test/clj"]
+  :output-dir ["target"])
