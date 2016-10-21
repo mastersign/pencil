@@ -72,7 +72,7 @@
 
 (defrecord LineStyle
   [^Color color
-   ^float width
+   ^double width
    ;; :butt, :round, :square
    line-cap
    ;; :bevel, :round, :miter
