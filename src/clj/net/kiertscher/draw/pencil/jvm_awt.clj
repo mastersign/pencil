@@ -26,10 +26,10 @@
 
 (defn- convert-color
   [c]
-  (Color. ^int (convert-color-value (:r c))
-          ^int (convert-color-value (:g c))
-          ^int (convert-color-value (:b c))
-          ^int (convert-color-value (:a c))))
+  (Color. ^int (convert-color-value (get c :r 0))
+          ^int (convert-color-value (get c :g 0))
+          ^int (convert-color-value (get c :b 0))
+          ^int (convert-color-value (get c :a 1))))
 
 (def ^:private line-caps
   {:butt   BasicStroke/CAP_BUTT
