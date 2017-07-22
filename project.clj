@@ -11,8 +11,12 @@
                       :compiler     {:output-to     "out/js/pencil.js"
                                      :optimizations :advanced}}
                :dev  {:source-paths ["src/cljc" "src/cljs" "test/cljc" "test/cljs"]
-                      :compiler      {:output-to     "out/js/pencil-test.js"
-                                      :optimizations :whitespace}}}}
+                      :compiler     {:optimizations :none
+                                     :main          "net.kiertscher.draw.js-canvas-test"
+                                     :output-dir    "out/js"
+                                     :output-to     "out/js/pencil-test.js"
+                                     :asset-path    "js"
+                                     :pretty-print  true}}}}
   :source-paths ["src/cljc" "src/clj" "src/cljs"]
   :test-paths ["test/cljc" "test/clj"]
   :output-dir ["target"])
