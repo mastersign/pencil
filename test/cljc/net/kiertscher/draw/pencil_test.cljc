@@ -249,6 +249,17 @@
     (p/clip-rect -18 -18 36 36)
     (p/fill-arc 0 0 20)))
 
+(defn sketch-clip-and-clear [ctx]
+  (doto ctx
+    (p/clip-rect 10 10 180 30)
+    (p/clear-all (p/color 0 0 1))
+    (p/translate 100 25)
+    (p/scale 0.5 0.5)
+    (p/set-fill-style (p/fill-style (p/color 1 0 0)))
+    (p/fill-rect -40 -20 80 40)
+    (p/clip-rect -40 -20 80 40)
+    (p/clear-all (p/color 0 1 0))))
+
 (defn sketch-table-layout [ctx]
   (let [t (l/table :columns 3
                    :rows 2
