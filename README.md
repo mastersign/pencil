@@ -15,7 +15,7 @@ Then implement a sketch function:
 
 ```clj
 (ns my-namespace.sketch
-  (:require [net.kiertscher.draw.pencil :as p]))
+  (:require [net.kiertscher.draw.pencil :as pencil]))
 
 (defn my-sketch
   [ctx]
@@ -30,12 +30,12 @@ Call `render-in-file` to render the sketch into an image file.
 
 ```clj
 (ns my-namespace
-  (:require [net.kiertscher.draw.pencil.jvm-awt :as awt]
+  (:require [net.kiertscher.draw.pencil.jvm-awt :as pencil-awt]
             [my-namespace.sketch :as s]))
 
 (defn -main
     []
-    (awt/render-in-file
+    (pencil-awt/render-in-file
       "/target/path/my-sketch.png" "PNG"
       100 80 s/my-sketch))
 ```
@@ -62,10 +62,10 @@ Call the `render` function, passing the id of the canvas element:
 
 ```clj
 (ns my-namespace
-  (:require [net.kiertscher.draw.pencil.js-canvas :as jsc]
+  (:require [net.kiertscher.draw.pencil.js-canvas :as pencil-jsc]
             [my-namespace.sketch :as s]))
 
-(jsc/render "my-sketch" s/my-sketch)
+(pencil-jsc/render "my-sketch" s/my-sketch)
 ```
 
 ## License
