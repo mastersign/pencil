@@ -292,17 +292,17 @@
                    :margin 2
                    :cell-spacing 2)
         b (l/box :range-x [-5 +15] :range-y [+15 -5])
-        p (fn [ctx] (doto ctx
-                      (p/set-fill-style (p/fill-style (p/color 0 0.25)))
-                      (p/fill-rect -5 -5 20 20)
-                      (p/set-line-style (p/line-style (p/color 0) 1))
-                      (p/draw-rect -5 -5 20 20)
-                      (p/draw-line -20 -20 +30 +30)
-                      (p/draw-line -20 +30 +30 -20)
-                      (p/draw-line -20 5 +30 5)
-                      (p/draw-line 5 -20 5 +30)
-                      (p/draw-arc 5 5 10)
-                      (p/draw-arc 0 0 2)))
+        part (fn [ctx] (doto ctx
+                         (p/set-fill-style (p/fill-style (p/color 0 0.25)))
+                         (p/fill-rect -5 -5 20 20)
+                         (p/set-line-style (p/line-style (p/color 0) 1))
+                         (p/draw-rect -5 -5 20 20)
+                         (p/draw-line -20 -20 +30 +30)
+                         (p/draw-line -20 +30 +30 -20)
+                         (p/draw-line -20 5 +30 5)
+                         (p/draw-line 5 -20 5 +30)
+                         (p/draw-arc 5 5 10)
+                         (p/draw-arc 0 0 2)))
         cells [{:column 0 :row 0 :box {:align-x :stretch :align-y :stretch}}
                {:column 1 :row 0 :box {:align-x :near :align-y :stretch}}
                {:column 2 :row 0 :box {:align-x :center :align-y :stretch}}
@@ -326,7 +326,8 @@
                              :column (:column c)
                              :row (:row c)
                              :box (l/box (merge b (:box c))))
-        p))))
+        part))))
+
 
 (def test-sketches
   {:line-style         {:f sketch-line-style :w 200 :h 100}
