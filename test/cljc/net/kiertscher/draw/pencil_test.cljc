@@ -328,20 +328,67 @@
                              :box (l/box (merge b (:box c))))
         part))))
 
+(defn sketch-nested-table-layout [ctx]
+  (let [outer-table (l/table :columns 2 :rows 2 :margin 4 :cell-spacing 4)
+        inner-table (l/table :columns 2 :rows 2 :margin 2 :cell-spacing 2)
+        b (l/box :range-x [-20 +20] :range-y [+10 -10])
+        cells [{:column 0 :row 0 :box {:align-x :stretch :align-y :stretch}}
+               {:column 1 :row 0 :box {:align-x :near :align-y :near}}
+               {:column 0 :row 1 :box {:align-x :far :align-y :far}}
+               {:column 1 :row 1 :box {:align-x :center :align-y :center}}]
+        child-sketch (fn [ctx]
+                       (doto ctx
+                         (p/set-fill-style (p/fill-style (p/color 0 1 0.5)))
+                         (p/fill-rect -20 -10 40 20)
+                         (p/set-line-style (p/line-style (p/color 0) 1))
+                         (p/draw-arc 0 0 9.5)
+                         (p/draw-arc 0 0 19.5)))]
+    (p/clear-all ctx (p/color 1))
+    (doseq [oc cells]
+      (l/render-with-layout
+        ctx
+        (l/table-cell-layout :table outer-table
+                             :column (:column oc)
+                             :row (:row oc)
+                             :box (l/box (merge b (:box oc)))
+                             :clip :cell)
+        (fn [ctx]
+          (doto ctx
+            (p/clear-all (p/color 1 1 0)))))
+      (l/render-with-layout
+        ctx
+        ; do not use a cell box in the table cell layout if a nested layout is going to be used
+        (l/table-cell-layout :table outer-table
+                             :column (:column oc)
+                             :row (:row oc)
+                             :clip :cell)
+        (fn [ctx]
+          (doseq [ic cells]
+            (l/render-with-layout
+              ctx
+              (l/table-cell-layout :table inner-table
+                                   :column (:column ic)
+                                   :row (:row ic)
+                                   :box (l/box (merge b (:box ic)))
+                                   :clip :box)
+              child-sketch))
+          )))))
 
 (def test-sketches
-  {:line-style         {:f sketch-line-style :w 200 :h 100}
-   :draw-line          {:f sketch-draw-line :w 200 :h 50}
-   :draw-rect          {:f sketch-draw-rect :w 200 :h 50}
-   :fill-rect          {:f sketch-fill-rect :w 200 :h 50}
-   :draw-arc           {:f sketch-draw-arc :w 200 :h 50}
-   :fill-arc           {:f sketch-fill-arc :w 200 :h 50}
-   :draw-curve         {:f sketch-draw-curve :w 200 :h 50}
-   :draw-path          {:f sketch-draw-path :w 200 :h 50}
-   :fill-path          {:f sketch-fill-path :w 200 :h 50}
-   :clip-path          {:f sketch-clip-path :w 200 :h 50}
-   :clear              {:f sketch-clear :w 200 :h 50}
-   :transform          {:f sketch-transform :w 200 :h 50}
-   :clip-and-stash     {:f sketch-clip-and-stash :w 200 :h 50}
-   :table-layout       {:f sketch-table-layout :w 200 :h 100}
-   :table-layout-align {:f sketch-table-layout-align :w 200 :h 150}})
+  {:line-style          {:f sketch-line-style :w 200 :h 100}
+   :draw-line           {:f sketch-draw-line :w 200 :h 50}
+   :draw-rect           {:f sketch-draw-rect :w 200 :h 50}
+   :fill-rect           {:f sketch-fill-rect :w 200 :h 50}
+   :draw-arc            {:f sketch-draw-arc :w 200 :h 50}
+   :fill-arc            {:f sketch-fill-arc :w 200 :h 50}
+   :draw-curve          {:f sketch-draw-curve :w 200 :h 50}
+   :draw-path           {:f sketch-draw-path :w 200 :h 50}
+   :fill-path           {:f sketch-fill-path :w 200 :h 50}
+   :clip-path           {:f sketch-clip-path :w 200 :h 50}
+   :clear               {:f sketch-clear :w 200 :h 50}
+   :transform           {:f sketch-transform :w 200 :h 50}
+   :clip-and-stash      {:f sketch-clip-and-stash :w 200 :h 50}
+   :clip-and-clear      {:f sketch-clip-and-clear :w 200 :h 50}
+   :table-layout        {:f sketch-table-layout :w 200 :h 100}
+   :table-layout-align  {:f sketch-table-layout-align :w 200 :h 150}
+   :table-layout-nested {:f sketch-nested-table-layout :w 200 :h 150}})
