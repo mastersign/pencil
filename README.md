@@ -19,9 +19,10 @@ Then implement a sketch function:
 
 (defn my-sketch
   [ctx]
-  (p/draw-rect 10 10 80 60)
-  (p/set-fill-style (p/fill-style (p/color 0.0 0.3 1.0)))
-  (p/fill-arc 50 40 15))
+  (doto ctx
+    (pencil/draw-rect 10 10 80 60)
+    (pencil/set-fill-style (p/fill-style (p/color 0.0 0.3 1.0)))
+    (pencil/fill-arc 50 40 15)))
 ```
 
 ### Clojure
