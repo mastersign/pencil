@@ -208,6 +208,12 @@
      | b d f |
      | 0 0 1 |")
 
+  (reset-transform [_]
+    "Sets the transformation matrix to:
+     | 1 0 0 |
+     | 0 1 0 |
+     | 0 0 1 |")
+
   (transform [_ a b c d e f]
     "Multiplies the current transformation matrix with:
      | a c e |

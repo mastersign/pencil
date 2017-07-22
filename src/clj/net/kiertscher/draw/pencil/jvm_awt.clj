@@ -317,6 +317,11 @@
       (.setTransform g t)
       (update-current-state ctx :transform t)))
 
+  (reset-transform [ctx]
+    (let [t-eye (AffineTransform.)]
+      (.setTransform g t-eye)
+      (update-current-state ctx :transform t-eye)))
+
   (transform [ctx a b c d e f]
     (let [t (AffineTransform. ^double a ^double b
                               ^double c ^double d

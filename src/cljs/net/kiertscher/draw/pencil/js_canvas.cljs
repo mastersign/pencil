@@ -239,6 +239,9 @@
   (set-transform [_ a b c d e f]
     (.setTransform g a b c d e f))
 
+  (reset-transform [_]
+    (.setTransform g 1 0 0 1 0 0))
+
   (transform [_ a b c d e f]
     (.transform g a b c d e f))
 
