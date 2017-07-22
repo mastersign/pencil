@@ -5,7 +5,7 @@
             :url  "https://opensource.org/licenses/MIT"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.229"]]
-  :plugins [[lein-cljsbuild "1.1.4"]]
+  :plugins [[lein-cljsbuild "1.1.6"]
   :cljsbuild {:builds
               {:prod {:source-paths ["src/cljc" "src/cljs"]
                       :compiler     {:output-to     "out/js/pencil.js"
