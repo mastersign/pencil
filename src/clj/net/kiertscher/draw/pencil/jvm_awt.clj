@@ -360,7 +360,16 @@
                                (assoc :stack (pop (:stack s))))
                            s)))
     (.setTransform g (get-current-state ctx :transform))
-    (.setClip g (get-current-state ctx :clipping))))
+    (.setClip g (get-current-state ctx :clipping)))
+
+  core/IRegion
+
+  (set-region [ctx x y w h]
+    (update-current-state ctx :region {:x x :y y :width w :height h}))
+
+  (get-region [ctx]
+    (get-current-state ctx :region)))
+
 
 (defn create-image
   [w h]
@@ -372,12 +381,13 @@
     (ImageIO/write img type f)))
 
 (defn- initial-state-atom
-  []
+  [w h]
   (atom {:stack   []
          :current {:line-style (core/line-style)
                    :fill-style (core/fill-style)
                    :transform  (AffineTransform.)
                    :clipping   nil
+                   :region     {:x 0 :y 0 :width w :height h}
                    :path       []}}))
 
 (defn render
@@ -386,7 +396,7 @@
     (doto g
       (.setRenderingHint RenderingHints/KEY_ANTIALIASING RenderingHints/VALUE_ANTIALIAS_ON)
       (.setRenderingHint RenderingHints/KEY_STROKE_CONTROL RenderingHints/VALUE_STROKE_PURE))
-    (let [ctx (->JavaAwtContext img g (initial-state-atom))]
+    (let [ctx (->JavaAwtContext img g (initial-state-atom (.getWidth img) (.getHeight img)))]
       (f ctx))
     (.dispose g)))
 

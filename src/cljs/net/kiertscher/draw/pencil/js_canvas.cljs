@@ -25,8 +25,19 @@
        (format-alpha-value (:a c))
        ")"))
 
+(defn- update-current-state
+  [ctx k v]
+  (swap! (:state ctx) (fn [s] (assoc-in s [:current k] v))))
+
+(defn- get-current-state
+  [ctx k]
+  (get-in (deref (:state ctx)) [:current k]))
+
 (defrecord HtmlCanvasContext
-  [id width height g]
+  [id
+   width height
+   g
+   state]
 
   core/IInformation
   (canvas-size [_]
@@ -265,16 +276,37 @@
   core/IStashing
 
   (push-state [_]
-    (.save g))
+    (.save g)
+    (swap! state (fn [s] (assoc s :stack (conj (:stack s) (:current s))))))
 
   (pop-state [_]
-    (.restore g)))
+    (.restore g)
+    (swap! state (fn [s] (if (not (empty? (:stack s)))
+                           (-> s
+                               (assoc :current (last (:stack s)))
+                               (assoc :stack (pop (:stack s))))
+                           s))))
+
+  core/IRegion
+
+  (set-region [ctx x y w h]
+    (update-current-state ctx :region {:x x :y y :width w :height h}))
+
+  (get-region [ctx]
+    (get-current-state ctx :region)))
+
+(defn- initial-state-atom
+  [w h]
+  (atom {:stack   []
+         :current {:region     {:x 0 :y 0 :width w :height h}}}))
 
 (defn render
   [id f]
-  (let [el (.getElementById js/document id)
-        ctx (.getContext el "2d")]
-    (doto (->HtmlCanvasContext id (.-width el) (.-height el) ctx)
-      (core/set-line-style (core/line-style))
-      (core/set-fill-style (core/fill-style))
-      (f))))
+  (if-let [el (.getElementById js/document id)]
+    (let [width (.-width el)
+          height (.-height el)
+          g (.getContext el "2d")]
+      (doto (->HtmlCanvasContext id (.-width el) (.-height el) g (initial-state-atom width height))
+        (core/set-line-style (core/line-style))
+        (core/set-fill-style (core/fill-style))
+        (f)))))

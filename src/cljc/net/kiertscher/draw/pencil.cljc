@@ -247,3 +247,9 @@
   (pop-state [_]
     "Pops the last context state from the stack.
      The state contains draw and fill style, transformation and clipping."))
+
+(defprotocol IRegion
+
+  (set-region [_ x y w h])
+
+  (get-region [_]))
