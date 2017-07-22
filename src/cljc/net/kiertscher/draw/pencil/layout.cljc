@@ -9,7 +9,6 @@
 (defn render-with-layout
   [ctx layout f]
   (p/push-state ctx)
-  (p/reset-transform ctx)
   (apply-layout layout ctx)
   (f ctx)
   (p/pop-state ctx))
@@ -129,15 +128,15 @@
   ILayout
 
   (apply-layout [_ ctx]
-    (let [[can-w can-h] (p/canvas-size ctx)
+    (let [{r-x :x r-y :y r-width :width r-height :height} (p/get-region ctx)
           cols (:columns table)                             ;; number of columns
           rows (:rows table)                                ;; number of rows
           [ml mt mr mb] (:margin table)                     ;; outer margin on x-box
           [csx csy] (:cell-spacing table)                   ;; spacing between cells on x-box
           dx (+ ml mr (* (dec cols) csx))                   ;; total margin and spacing on x-box
           dy (+ mt mb (* (dec rows) csy))                   ;; total margin and spacing on y-box
-          cw (/ (- can-w dx) cols)                          ;; cell width
-          ch (/ (- can-h dy) rows)                          ;; cell height
+          cw (/ (- r-width dx) cols)                        ;; cell width
+          ch (/ (- r-height dy) rows)                       ;; cell height
           ccw (+ (* cw column-span)                         ;; current cell width
                  (* csx (dec column-span)))
           cch (+ (* ch row-span)                            ;; current cell height
@@ -145,21 +144,21 @@
           ccx (+ ml (* (+ cw csx) column))                  ;; current cell left
           ccy (+ mt (* (+ ch csy) row))]                    ;; current cell top
       (p/translate ctx ccx ccy)
-      (when (= clip :cell)
+      (p/set-region ctx 0 0 ccw cch)
+      (when (or (= clip :cell) (and (not box) (= clip :box)))
         (p/clip-rect ctx 0 0 ccw cch))
       (when box
         (let [[tx ty sx sy] (box-transform-2 ccw cch box)]
           (p/translate ctx tx ty)
           (p/scale ctx sx sy)
-          (when (= clip :box)
-            (let [{[x-l x-r] :range-x
-                   [y-t y-b] :range-y} box]
-              (p/clip-rect ctx
-                           (- x-l) (- y-t)
-                           (- x-r x-l) (- y-b y-t))))))))
+          (let [{[x0 x1] :range-x
+                 [y0 y1] :range-y} box]
+            (p/set-region ctx x0 y0 (- x1 x0) (- y1 y0))
+            (when (= clip :box)
+              (p/clip-rect ctx x0 y0 (- x1 x0) (- y1 y0))))))))
 
   (scale [_ x y]
-    (merge _ {:table (merge table {:margin (scale-border* (:margin table) x y)
+    (merge _ {:table (merge table {:margin       (scale-border* (:margin table) x y)
                                    :cell-spacing (scale-spacing* (:cell-spacing table) x y)})})))
 
 (def ^:dynamic *default-table-cell-layout*
