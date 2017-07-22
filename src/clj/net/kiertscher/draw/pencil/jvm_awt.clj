@@ -143,15 +143,23 @@
 
   (clear-all [_]
     (let [w (.getWidth img)
-          h (.getHeight img)]
-      (clear-rect g 0 0 w h)))
-  
+          h (.getHeight img)
+          t (.getTransform g)
+          t-eye (AffineTransform.)]
+      (.setTransform g t-eye)
+      (clear-rect g 0 0 w h)
+      (.setTransform g t)))
+
   (clear-all [_ c]
     (let [w (.getWidth img)
-          h (.getHeight img)]
+          h (.getHeight img)
+          t (.getTransform g)
+          t-eye (AffineTransform.)]
+      (.setTransform g t-eye)
       (clear-rect g 0 0 w h)
       (.setColor g (convert-color c))
-      (.fillRect g 0 0 w h)))
+      (.fillRect g 0 0 w h)
+      (.setTransform g t)))
 
   core/IDrawing
 

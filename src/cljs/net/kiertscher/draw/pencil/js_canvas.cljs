@@ -56,14 +56,20 @@
       (set! (.-fillStyle g) fill-style)))
 
   (clear-all [_]
-    (.clearRect g 0 0 width height))
+    (.save g)
+    (.setTransform g 1 0 0 1 0 0)
+    (.clearRect g 0 0 width height)
+    (.restore g))
 
   (clear-all [_ c]
+    (.save g)
+    (.setTransform g 1 0 0 1 0 0)
     (.clearRect g 0 0 width height)
     (let [fill-style (.-fillStyle g)]
       (set! (.-fillStyle g) (color->css c))
       (.fillRect g 0 0 width height)
-      (set! (.-fillStyle g) fill-style)))
+      (set! (.-fillStyle g) fill-style))
+    (.restore g))
 
   core/IDrawing
 
