@@ -72,10 +72,19 @@
         {:keys [color]} (get-current-state ctx :fill-style)]
     (.setColor g (convert-color color))))
 
+(defn- norm-rect [x y w h]
+  (let [x2 (+ x w)
+        y2 (+ y h)]
+    (Rectangle2D$Double.
+      (min x x2)
+      (min y y2)
+      (Math/abs ^double (- x2 x))
+      (Math/abs ^double (- y2 y)))))
+
 (defn- clear-rect [g x y w h]
   (let [comp (.getComposite g)]
     (.setComposite g AlphaComposite/Clear)
-    (.fillRect g x y w h)
+    (.fill g (norm-rect x y w h))
     (.setComposite g comp)))
 
 (defn- ^Shape build-ellipse
@@ -139,7 +148,7 @@
   (clear-rect [_ x y w h c]
     (clear-rect g x y w h)
     (.setColor g (convert-color c))
-    (.fillRect g x y w h))
+    (.fill g (norm-rect x y w h)))
 
   (clear-all [_]
     (let [w (.getWidth img)
@@ -174,8 +183,7 @@
 
   (draw-rect [ctx x y w h]
     (apply-current-line-style ctx)
-    (let [s (Rectangle2D$Double. x y w h)]
-      (.draw g s)))
+     (.draw g (norm-rect x y w h)))
 
   (draw-arc [ctx x y r]
     (apply-current-line-style ctx)
@@ -215,8 +223,7 @@
 
   (fill-rect [ctx x y w h]
     (apply-current-fill-style ctx)
-    (let [s (Rectangle2D$Double. x y w h)]
-      (.fill g s)))
+    (.fill g (norm-rect x y w h)))
 
   (fill-arc [ctx x y r]
     (apply-current-fill-style ctx)
@@ -352,8 +359,7 @@
   core/IClipping
 
   (clip-rect [ctx x y w h]
-    (let [s (Rectangle2D$Double. x y w h)]
-      (.clip g s))
+    (.clip g (norm-rect x y w h))
     (update-current-state ctx :clipping (.getClip g)))
 
   core/IStashing
