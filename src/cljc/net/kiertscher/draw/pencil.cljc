@@ -230,7 +230,7 @@
 (defprotocol IClipping
 
   (clip-rect [_ x y w h]
-    "Constraints further drawing to the inner of the given axis-align rectangle."))
+    "Constraints further drawing to the inner of the given axis-aligned rectangle."))
 
 (defprotocol IStashing
 
